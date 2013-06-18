@@ -15,10 +15,19 @@ namespace AttributeCaching
 		private string methodDeclaration;
 		private string propertyGetMethodDeclaration;
 		private bool isPropertySetMethod;
+		private readonly TimeSpan lifeSpan;
+
 
 		public CacheableAttribute()
 		{
+			lifeSpan = TimeSpan.FromDays (36500);
 		}
+
+		public CacheableAttribute(double lifeSpanSeconds)
+		{
+			lifeSpan = TimeSpan.FromSeconds (lifeSpanSeconds);
+		}
+
 
 
 		/// <summary>
@@ -86,7 +95,7 @@ namespace AttributeCaching
 		{
 			string key = (string)args.MethodExecutionTag;
 			if (args.ReturnValue!= null)
-				CacheFactory.Cache.Add (key, args.ReturnValue, DateTimeOffset.Now.AddDays (2));
+				CacheFactory.Cache.Add (key, args.ReturnValue, DateTimeOffset.Now.Add (lifeSpan));
 		}
 
 

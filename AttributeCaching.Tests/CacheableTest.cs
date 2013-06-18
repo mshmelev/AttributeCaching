@@ -164,12 +164,26 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void TestExpiration()
+		{
+			visitor.Expect(m => m.Visit("a1")).Repeat.Once();
+			Assert.AreEqual("a1", testClass.CalcExpiring ("a1"));
+			Assert.AreEqual("a1", testClass.CalcExpiring ("a1"));
+
+			System.Threading.Thread.Sleep (21);
+			visitor.Expect(m => m.Visit("a1")).Repeat.Once();
+			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
+			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
+		}
+
+
+
 
 
 
 		/*
 		 * TODO:
-		 * - Not cacheable as a method
 		 * - Caching time
 		 * - Caching context (to manage cache from within a cacheable method)
 		 * - Dependencies
