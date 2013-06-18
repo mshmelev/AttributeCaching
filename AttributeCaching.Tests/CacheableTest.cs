@@ -184,7 +184,6 @@ namespace AttributeCaching.Tests
 
 		/*
 		 * TODO:
-		 * - Caching time
 		 * - Caching context (to manage cache from within a cacheable method)
 		 * - Dependencies
 		 * 

@@ -1,12 +1,12 @@
 ﻿namespace AttributeCaching.Tests
 {
 	[Cacheable]
-	public class TestNotCacheableClass
+	public class TestTopCacheClass
 	{
 		private readonly IVisitor visitor;
 
 		[Cacheable(AttributeExclude = true)]
-		public TestNotCacheableClass(IVisitor visitor)
+		public TestTopCacheClass(IVisitor visitor)
 		{
 			this.visitor = visitor;
 		}
@@ -40,6 +40,13 @@
 			{
 				visitor.Visit (value);
 			}
+		}
+
+		[Cacheable(0.01, AspectPriority = 1)]
+		public string CalcCacheOverride()
+		{
+			visitor.Visit();
+			return "cached";
 		}
 
 	}

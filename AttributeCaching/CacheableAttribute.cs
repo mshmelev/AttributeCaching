@@ -25,7 +25,7 @@ namespace AttributeCaching
 
 		public CacheableAttribute(double lifeSpanSeconds)
 		{
-			lifeSpan = TimeSpan.FromSeconds (lifeSpanSeconds);
+			lifeSpan = TimeSpan.FromSeconds(lifeSpanSeconds);
 		}
 
 
