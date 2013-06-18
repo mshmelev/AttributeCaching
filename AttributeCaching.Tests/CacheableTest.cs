@@ -145,11 +145,31 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void TestIgnoreParam()
+		{
+			visitor.Expect(m => m.Visit("a1", "b1", "c1")).Repeat.Once();
+			Assert.AreEqual("a1_c1", testClass.CalcIgnoreParam ("a1", "b1", "c1"));
+			Assert.AreEqual("a1_c1", testClass.CalcIgnoreParam("a1", "b2", "c1"));
+			Assert.AreEqual("a1_c1", testClass.CalcIgnoreParam("a1", "", "c1"));
+			Assert.AreEqual("a1_c1", testClass.CalcIgnoreParam("a1", null, "c1"));
+
+			visitor.Expect(m => m.Visit("a2", "b1", "c1")).Repeat.Once();
+			Assert.AreEqual("a2_c1", testClass.CalcIgnoreParam("a2", "b1", "c1"));
+			Assert.AreEqual("a2_c1", testClass.CalcIgnoreParam("a2", "b2", "c1"));
+
+			visitor.Expect(m => m.Visit("a2", "b1", "c2")).Repeat.Once();
+			Assert.AreEqual("a2_c2", testClass.CalcIgnoreParam("a2", "b1", "c2"));
+			Assert.AreEqual("a2_c2", testClass.CalcIgnoreParam("a2", "b2", "c2"));
+		}
+
+
+
+
 
 		/*
 		 * TODO:
-		 * - Indexed properties
-		 * - Ignore parameter
+		 * - Not cacheable as a method
 		 * - Caching time
 		 * - Caching context (to manage cache from within a cacheable method)
 		 * - Dependencies

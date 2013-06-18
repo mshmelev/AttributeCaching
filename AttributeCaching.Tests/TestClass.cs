@@ -96,12 +96,11 @@ namespace AttributeCaching.Tests
 
 
 
-
-		public string Calc2 (
-			string prop1,
-			[CacheIgnore] string prop2)
+		[Cacheable]
+		public string CalcIgnoreParam(string prop1, [CacheIgnore] string prop2, string prop3)
 		{
-			return prop1 + "_" + prop2;
+			visitor.Visit(prop1, prop2, prop3);
+			return prop1 + "_"+ prop3;
 		}
 
 
