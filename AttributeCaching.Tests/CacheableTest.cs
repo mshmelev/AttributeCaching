@@ -23,9 +23,10 @@ namespace AttributeCaching.Tests
 		public void Cleanup()
 		{
 			visitor.VerifyAllExpectations();
+			((IDisposable)CacheFactory.Cache).Dispose();
 		}
 
-
+		
 
 		[TestMethod]
 		public void TestGeneralCaching()
@@ -39,7 +40,6 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual ("c_d", testClass.Calc("c", "d"));
 		}
 
-
 		[TestMethod]
 		public void TestNoParameter()
 		{
@@ -50,7 +50,6 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("noparam2", testClass.Calc2());
 		}
 
-
 		[TestMethod]
 		public void TestOverloaded()
 		{
@@ -58,6 +57,29 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("int_1", testClass.CalcOverloaded(1));
 			Assert.AreEqual("string_1", testClass.CalcOverloaded("1"));
 		}
+
+
+		[TestMethod]
+		public void TestNullParams()
+		{
+			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(5);
+			Assert.AreEqual ("_", testClass.Calc(null, null));
+			Assert.AreEqual ("_", testClass.Calc("", null));
+			Assert.AreEqual ("_", testClass.Calc(null, ""));
+			Assert.AreEqual("null_null", testClass.Calc("null", "null"));
+			Assert.AreEqual("noparam", testClass.Calc());
+		}
+
+
+		/*
+		 * TODO:
+		 * - Ignore parameter
+		 * - Properties
+		 * - Caching time
+		 * - Dependencies
+		 * 
+		 * */
+
 
 	}
 }

@@ -7,6 +7,7 @@ namespace AttributeCaching
 	internal static class KeyBuilder
 	{
 		private const char ParamSeparator = '\u5678';
+		private const string EmptyStringReplacer = "\u0000";
 
 		public static string BuildKey (MethodExecutionArgs args, string methodDeclaration, int[] cacheArgIndexes)
 		{
@@ -14,7 +15,16 @@ namespace AttributeCaching
 
 			foreach (int cacheArgIndex in cacheArgIndexes)
 			{
-				key.Append (args.Arguments[cacheArgIndex]);
+				object val= args.Arguments[cacheArgIndex];
+				string strVal= "";
+				if (val != null)
+				{
+					strVal = val.ToString();
+					if (strVal.Length == 0)
+						strVal = EmptyStringReplacer;
+				}
+
+				key.Append (strVal);
 				key.Append (ParamSeparator);
 			}
 
@@ -22,6 +32,13 @@ namespace AttributeCaching
 		}
 
 
+
+
+		/// <summary>
+		/// Generates method full signature including parameter types
+		/// </summary>
+		/// <param name="method"></param>
+		/// <returns></returns>
 		public static string GetMethodDeclaration(MethodBase method)
 		{
 			var res = new StringBuilder();

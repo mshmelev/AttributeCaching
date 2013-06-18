@@ -55,13 +55,5 @@
 		}
 
 
-		/*
-		 * TODO:
-		 * - Check null params
-		 * - Properties
-		 * - Caching time
-		 * - Dependencies
-		 * 
-		 * */
 	}
 }
