@@ -4,18 +4,20 @@ namespace AttributeCaching.Tests
 {
 	public class TestClass
 	{
-		private readonly IVisitorTest visitorTest;
+		private readonly IVisitor visitor;
+		private string propValue = "prop";
 
-		public TestClass(IVisitorTest visitorTest)
+
+		public TestClass(IVisitor visitor)
 		{
-			this.visitorTest = visitorTest;
+			this.visitor = visitor;
 		}
 
 
 		[Cacheable]
 		public string Calc(string prop1, string prop2)
 		{
-			visitorTest.Visit (prop1, prop2);
+			visitor.Visit (prop1, prop2);
 
 			return prop1 + "_" + prop2;
 		}
@@ -23,28 +25,28 @@ namespace AttributeCaching.Tests
 		[Cacheable]
 		public string Calc()
 		{
-			visitorTest.Visit();
+			visitor.Visit();
 			return "noparam";
 		}
 
 		[Cacheable]
 		public string Calc2()
 		{
-			visitorTest.Visit();
+			visitor.Visit();
 			return "noparam2";
 		}
 
 		[Cacheable]
 		public string CalcOverloaded(int id)
 		{
-			visitorTest.Visit();
+			visitor.Visit();
 			return "int_"+id;
 		}
 
 		[Cacheable]
 		public string CalcOverloaded(string id)
 		{
-			visitorTest.Visit();
+			visitor.Visit();
 			return "string_"+id;
 		}
 
@@ -52,7 +54,7 @@ namespace AttributeCaching.Tests
 		[Cacheable]
 		public string CalcArray(string[] arr1, string[] arr2)
 		{
-			visitorTest.Visit(arr1, arr2);
+			visitor.Visit(arr1, arr2);
 			return String.Join("_", arr1) + "," + String.Join("_", arr2);
 		}
 
@@ -60,9 +62,27 @@ namespace AttributeCaching.Tests
 		[Cacheable]
 		public string CalcParams(params string[] props)
 		{
-			visitorTest.Visit(props);
+			visitor.Visit(props);
 			return "params_"+props.Length;
 		}
+
+
+		[Cacheable]
+		public string CalcProp
+		{
+			get
+			{
+				visitor.Visit ();
+				return propValue;
+			}
+			set
+			{
+				visitor.Visit(value);
+				propValue = value;
+			}
+		}
+
+
 
 
 		public string Calc2 (

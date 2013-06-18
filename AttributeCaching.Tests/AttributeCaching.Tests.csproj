@@ -60,7 +60,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="IVisitorTest.cs" />
+    <Compile Include="IVisitor.cs" />
     <Compile Include="TestClass.cs" />
     <Compile Include="RequiresPostSharp.cs" />
     <Compile Include="CacheableTest.cs" />

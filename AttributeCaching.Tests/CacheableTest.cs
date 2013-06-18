@@ -7,14 +7,14 @@ namespace AttributeCaching.Tests
 	[TestClass]
 	public class CacheableTest
 	{
-		private IVisitorTest visitor;
+		private IVisitor visitor;
 		private TestClass testClass;
 
 
 		[TestInitialize]
 		public void Init()
 		{
-			visitor = MockRepository.GenerateDynamicMockWithRemoting<IVisitorTest>();
+			visitor = MockRepository.GenerateDynamicMockWithRemoting<IVisitor>();
 			testClass = new TestClass(visitor);
 		}
 
@@ -104,11 +104,43 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void TestProperties()
+		{
+			visitor.Expect (m => m.Visit()).Repeat.Once();
+			Assert.AreEqual ("prop", testClass.CalcProp);
+			Assert.AreEqual ("prop", testClass.CalcProp);
+		}
+
+
+		[TestMethod]
+		public void TestPropertySetNotCacheable()
+		{
+			visitor.Expect (m => m.Visit("prop2")).Repeat.Twice();
+			testClass.CalcProp = "prop2";
+			testClass.CalcProp = "prop2";
+		}
+
+		[TestMethod]
+		public void TestPropertyCacheReset()
+		{
+			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(3);
+			Assert.AreEqual ("prop", testClass.CalcProp);
+			Assert.AreEqual ("prop", testClass.CalcProp);
+
+			testClass.CalcProp = "prop2";
+			Assert.AreEqual("prop2", testClass.CalcProp);
+			Assert.AreEqual("prop2", testClass.CalcProp);
+		}
+
+
 		/*
 		 * TODO:
-		 * - Ignore parameter
 		 * - Properties
+		 * - Indexed properties
+		 * - Ignore parameter
 		 * - Caching time
+		 * - Caching context (to manage cache from within a cacheable method)
 		 * - Dependencies
 		 * 
 		 * */

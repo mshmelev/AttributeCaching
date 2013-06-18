@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Caching;
+using System.Text;
 using PostSharp.Aspects;
 
 namespace AttributeCaching
@@ -11,6 +12,8 @@ namespace AttributeCaching
 	{
 		private int[] cacheArgIndexes;
 		private string methodDeclaration;
+		private string propertyGetMethodDeclaration;
+		private bool isPropertySetMethod;
 
 		public CacheableAttribute()
 		{
@@ -22,10 +25,19 @@ namespace AttributeCaching
 		/// </summary>
 		/// <param name="method"></param>
 		/// <param name="aspectInfo"></param>
-		public override void CompileTimeInitialize(System.Reflection.MethodBase method, AspectInfo aspectInfo)
+		public override void CompileTimeInitialize(MethodBase method, AspectInfo aspectInfo)
 		{
 			BuildCacheableArgIndexes(method);
-			methodDeclaration = KeyBuilder.GetMethodDeclaration(method);
+			methodDeclaration = GetMethodDeclaration(method);
+
+			if (method.IsSpecialName)
+			{
+				if (method.Name.StartsWith ("set_"))
+				{
+					isPropertySetMethod = true;
+					propertyGetMethodDeclaration = GetMethodDeclaration (method, "get_" + method.Name.Substring (4));
+				}
+			}
 		}
 
 
@@ -55,7 +67,7 @@ namespace AttributeCaching
 		/// <param name="args"></param>
 		public override void OnEntry(MethodExecutionArgs args)
 		{
-			string key = KeyBuilder.BuildKey(args, methodDeclaration, cacheArgIndexes);
+			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
 			args.MethodExecutionTag = key;
 
 			object value = CacheFactory.Cache.Get (key);
@@ -67,11 +79,58 @@ namespace AttributeCaching
 		}
 
 
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="args"></param>
 		public override void OnSuccess(MethodExecutionArgs args)
 		{
 			string key = (string)args.MethodExecutionTag;
 			if (args.ReturnValue!= null)
 				CacheFactory.Cache.Add (key, args.ReturnValue, DateTimeOffset.Now.AddDays (2));
+		}
+
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="args"></param>
+		public override void OnExit(MethodExecutionArgs args)
+		{
+			// clear property Get cache
+			if (isPropertySetMethod)
+			{
+				string key = KeyBuilder.BuildKey(null, propertyGetMethodDeclaration, new int[0]);
+				CacheFactory.Cache.Remove(key);
+			}
+		}
+
+
+		/// <summary>
+		/// Generates method full signature including parameter types
+		/// </summary>
+		/// <param name="method"></param>
+		/// <param name="methodName"></param>
+		/// <returns></returns>
+		private static string GetMethodDeclaration(MethodBase method, string methodName= null)
+		{
+			var res = new StringBuilder();
+			res.Append (method.ReflectedType.FullName);
+			res.Append ('.');
+			res.Append(methodName ?? method.Name);
+
+			res.Append('(');
+			var pars = method.GetParameters();
+			foreach (var parameterInfo in pars)
+			{
+				res.Append (parameterInfo.ParameterType.FullName);
+				res.Append (',');
+			}
+			res.Append (')');
+
+			return res.ToString();
 		}
 	}
 }

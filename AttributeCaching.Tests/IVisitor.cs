@@ -1,6 +1,6 @@
 ﻿namespace AttributeCaching.Tests
 {
-	public interface IVisitorTest
+	public interface IVisitor
 	{
 		void Visit (params object[] parameters);
 	}

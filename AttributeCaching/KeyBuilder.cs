@@ -21,46 +21,18 @@ namespace AttributeCaching
 		/// <param name="methodDeclaration"></param>
 		/// <param name="cacheArgIndexes"></param>
 		/// <returns></returns>
-		public static string BuildKey (MethodExecutionArgs args, string methodDeclaration, int[] cacheArgIndexes)
+		public static string BuildKey (Arguments args, string methodDeclaration, int[] cacheArgIndexes)
 		{
 			var key = new StringBuilder(methodDeclaration);
 
 			foreach (int cacheArgIndex in cacheArgIndexes)
 			{
-				key.Append (GetParamValue(args.Arguments[cacheArgIndex]));
+				key.Append (GetParamValue(args[cacheArgIndex]));
 				key.Append (ParamSeparator);
 			}
 
 			return key.ToString();
 		}
-
-
-		/// <summary>
-		/// Generates method full signature including parameter types
-		/// </summary>
-		/// <param name="method"></param>
-		/// <returns></returns>
-		public static string GetMethodDeclaration(MethodBase method)
-		{
-			var res = new StringBuilder();
-			res.Append (method.ReflectedType.FullName);
-			res.Append ('.');
-			res.Append (method.Name);
-
-			res.Append('(');
-			var pars = method.GetParameters();
-			foreach (var parameterInfo in pars)
-			{
-				res.Append (parameterInfo.ParameterType.FullName);
-				res.Append (',');
-			}
-			res.Append (')');
-
-			return res.ToString();
-		}
-
-
-
 
 
 		private static string GetParamValue (object val)
