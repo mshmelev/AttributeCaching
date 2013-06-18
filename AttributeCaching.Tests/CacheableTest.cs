@@ -71,6 +71,39 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void TestArrays()
+		{
+			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(4);
+
+			Assert.AreEqual ("a_b_c,d_e", testClass.CalcArray(new[] {"a","b","c"}, new[] {"d","e"}));
+			Assert.AreEqual ("a_b_c,d_e", testClass.CalcArray(new[] {"a","b","c"}, new[] {"d","e"}));
+			
+			Assert.AreEqual ("a_bb_c,d_e", testClass.CalcArray(new[] {"a","bb","c"}, new[] {"d","e"}));
+			Assert.AreEqual ("a_bb_c,d_e", testClass.CalcArray(new[] {"a","bb","c"}, new[] {"d","e"}));
+			
+			Assert.AreEqual("a_b_c,", testClass.CalcArray(new[] { "a", "b", "c" }, new string[0]));
+			Assert.AreEqual("a_b_c,", testClass.CalcArray(new[] { "a", "b", "c" }, new string[0]));
+
+			Assert.AreEqual(",", testClass.CalcArray(new string[0], new string[0]));
+			Assert.AreEqual(",", testClass.CalcArray(new string[0], new string[0]));
+		}
+
+
+
+		[TestMethod]
+		public void TestVariedParams()
+		{
+			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(3);
+			Assert.AreEqual ("params_1", testClass.CalcParams("par1"));
+			Assert.AreEqual ("params_1", testClass.CalcParams("par1"));
+			Assert.AreEqual ("params_2", testClass.CalcParams("par1", "par2"));
+			Assert.AreEqual ("params_2", testClass.CalcParams("par1", "par2"));
+			Assert.AreEqual ("params_0", testClass.CalcParams());
+			Assert.AreEqual ("params_0", testClass.CalcParams());
+		}
+
+
 		/*
 		 * TODO:
 		 * - Ignore parameter

@@ -1,4 +1,6 @@
-﻿namespace AttributeCaching.Tests
+﻿using System;
+
+namespace AttributeCaching.Tests
 {
 	public class TestClass
 	{
@@ -47,12 +49,30 @@
 		}
 
 
+		[Cacheable]
+		public string CalcArray(string[] arr1, string[] arr2)
+		{
+			visitorTest.Visit(arr1, arr2);
+			return String.Join("_", arr1) + "," + String.Join("_", arr2);
+		}
+
+
+		[Cacheable]
+		public string CalcParams(params string[] props)
+		{
+			visitorTest.Visit(props);
+			return "params_"+props.Length;
+		}
+
+
 		public string Calc2 (
 			string prop1,
 			[CacheIgnore] string prop2)
 		{
 			return prop1 + "_" + prop2;
 		}
+
+
 
 
 	}
