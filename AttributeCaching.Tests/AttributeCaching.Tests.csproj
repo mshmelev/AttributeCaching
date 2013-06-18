@@ -61,10 +61,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="IVisitor.cs" />
+    <Compile Include="NotCacheableTest.cs" />
     <Compile Include="TestClass.cs" />
     <Compile Include="RequiresPostSharp.cs" />
     <Compile Include="CacheableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestNotCacheableClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AttributeCaching\AttributeCaching.csproj">

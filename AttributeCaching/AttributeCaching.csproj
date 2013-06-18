@@ -49,8 +49,9 @@
     <Compile Include="CacheableAttribute.cs" />
     <Compile Include="CacheFactory.cs" />
     <Compile Include="CacheIgnoreAttribute.cs" />
-    <Compile Include="KeyBuilder.cs" />
+    <Compile Include="Tools\KeyBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\Reflection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

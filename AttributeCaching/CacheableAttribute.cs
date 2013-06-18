@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Caching;
 using System.Text;
+using AttributeCaching.Tools;
 using PostSharp.Aspects;
 
 namespace AttributeCaching
@@ -28,15 +29,12 @@ namespace AttributeCaching
 		public override void CompileTimeInitialize(MethodBase method, AspectInfo aspectInfo)
 		{
 			BuildCacheableArgIndexes(method);
-			methodDeclaration = GetMethodDeclaration(method);
+			methodDeclaration = Reflection.GetMethodDeclaration(method);
 
-			if (method.IsSpecialName)
+			if (method.IsSpecialName && method.Name.StartsWith("set_"))
 			{
-				if (method.Name.StartsWith ("set_"))
-				{
-					isPropertySetMethod = true;
-					propertyGetMethodDeclaration = GetMethodDeclaration (method.ReflectedType.GetMethod("get_" + method.Name.Substring(4)));
-				}
+				isPropertySetMethod = true;
+				propertyGetMethodDeclaration = Reflection.GetMethodDeclaration (method.ReflectedType.GetMethod("get_" + method.Name.Substring(4)));
 			}
 		}
 
@@ -105,31 +103,6 @@ namespace AttributeCaching
 				string key = KeyBuilder.BuildKey(null, propertyGetMethodDeclaration, new int[0]);
 				CacheFactory.Cache.Remove(key);
 			}
-		}
-
-
-		/// <summary>
-		/// Generates method full signature including parameter types
-		/// </summary>
-		/// <param name="method"></param>
-		/// <returns></returns>
-		private static string GetMethodDeclaration(MethodBase method)
-		{
-			var res = new StringBuilder();
-			res.Append (method.ReflectedType.FullName);
-			res.Append ('.');
-			res.Append (method.Name);
-
-			res.Append('(');
-			var pars = method.GetParameters();
-			foreach (var parameterInfo in pars)
-			{
-				res.Append (parameterInfo.ParameterType.FullName);
-				res.Append (',');
-			}
-			res.Append (')');
-
-			return res.ToString();
 		}
 	}
 }

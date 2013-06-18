@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Reflection;
+﻿using System.Collections;
 using System.Text;
 using PostSharp.Aspects;
 
-namespace AttributeCaching
+namespace AttributeCaching.Tools
 {
 	internal static class KeyBuilder
 	{
