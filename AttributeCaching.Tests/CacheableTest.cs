@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Caching;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
 
@@ -24,6 +25,7 @@ namespace AttributeCaching.Tests
 		{
 			visitor.VerifyAllExpectations();
 			((IDisposable)CacheFactory.Cache).Dispose();
+			CacheFactory.Cache= new MemoryCache ("test");
 		}
 
 		
@@ -133,10 +135,19 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("prop2", testClass.CalcProp);
 		}
 
+		
+		[TestMethod]
+		public void TestIndexedProperty()
+		{
+			visitor.Expect (m => m.Visit("a1")).Repeat.Once();
+			Assert.AreEqual ("ind_a1", testClass["a1"]);
+			Assert.AreEqual ("ind_a1", testClass["a1"]);
+		}
+
+
 
 		/*
 		 * TODO:
-		 * - Properties
 		 * - Indexed properties
 		 * - Ignore parameter
 		 * - Caching time

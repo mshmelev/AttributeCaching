@@ -83,6 +83,18 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[Cacheable]
+		public string this [string index]
+		{
+			get
+			{
+				visitor.Visit(index);
+				return "ind_" + index;
+			}
+
+		}
+
+
 
 
 		public string Calc2 (

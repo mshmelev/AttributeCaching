@@ -35,7 +35,7 @@ namespace AttributeCaching
 				if (method.Name.StartsWith ("set_"))
 				{
 					isPropertySetMethod = true;
-					propertyGetMethodDeclaration = GetMethodDeclaration (method, "get_" + method.Name.Substring (4));
+					propertyGetMethodDeclaration = GetMethodDeclaration (method.ReflectedType.GetMethod("get_" + method.Name.Substring(4)));
 				}
 			}
 		}
@@ -112,14 +112,13 @@ namespace AttributeCaching
 		/// Generates method full signature including parameter types
 		/// </summary>
 		/// <param name="method"></param>
-		/// <param name="methodName"></param>
 		/// <returns></returns>
-		private static string GetMethodDeclaration(MethodBase method, string methodName= null)
+		private static string GetMethodDeclaration(MethodBase method)
 		{
 			var res = new StringBuilder();
 			res.Append (method.ReflectedType.FullName);
 			res.Append ('.');
-			res.Append(methodName ?? method.Name);
+			res.Append (method.Name);
 
 			res.Append('(');
 			var pars = method.GetParameters();
