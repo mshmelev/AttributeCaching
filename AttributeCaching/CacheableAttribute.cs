@@ -85,7 +85,7 @@ namespace AttributeCaching
 				return;
 			}
 
-			var context= CacheScope.AddContext (key);
+			var context= CacheScope.AddContext (key, lifeSpan);
 			args.MethodExecutionTag = context;
 		}
 
@@ -97,9 +97,9 @@ namespace AttributeCaching
 		/// <param name="args"></param>
 		public override void OnSuccess(MethodExecutionArgs args)
 		{
-			string key = ((CacheContext)args.MethodExecutionTag).CacheKey;
+			var cacheContext = (CacheContext) args.MethodExecutionTag;
 			if (args.ReturnValue!= null)
-				CacheFactory.Cache.Add (key, args.ReturnValue, DateTimeOffset.Now.Add (lifeSpan));
+				CacheFactory.Cache.Add (cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add (cacheContext.LifeSpan));
 		}
 
 

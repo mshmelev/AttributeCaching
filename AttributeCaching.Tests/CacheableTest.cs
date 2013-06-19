@@ -178,18 +178,5 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
 		}
 
-
-
-
-
-
-		/*
-		 * TODO:
-		 * - Caching context (to manage cache from within a cacheable method)
-		 * - Dependencies
-		 * 
-		 * */
-
-
 	}
 }

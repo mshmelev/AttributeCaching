@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AttributeCaching.Tests.Helpers
@@ -69,5 +70,17 @@ namespace AttributeCaching.Tests.Helpers
 			visitor.Visit(CacheScope.CurrentContext.CacheKey);
 			return "cached_thread1";
 		}
+
+
+		[Cacheable (1000)]
+		public string CalcExpiring()
+		{
+			visitor.Visit();
+
+			CacheScope.CurrentContext.LifeSpan = TimeSpan.FromMilliseconds (10);
+
+			return "cached";
+		}
+
 	}
 }

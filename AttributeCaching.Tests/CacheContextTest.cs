@@ -60,6 +60,17 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void LifeTimeChange()
+		{
+			visitor.Expect (m => m.Visit()).Repeat.Twice();
+			testClass.CalcExpiring();
+			System.Threading.Thread.Sleep (20);
+			testClass.CalcExpiring();
+		}
+
+
+
 
 	}
 }

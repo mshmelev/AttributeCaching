@@ -9,9 +9,9 @@ namespace AttributeCaching
 		private static Stack<CacheContext> contexts;
 
 
-		internal static CacheContext AddContext (string cacheKey)
+		internal static CacheContext AddContext(string cacheKey, TimeSpan lifeSpan)
 		{
-			var ctx = new CacheContext (cacheKey);
+			var ctx = new CacheContext(cacheKey, lifeSpan);
 			Contexts.Push(ctx);
 
 			return ctx;
