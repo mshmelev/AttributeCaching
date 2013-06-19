@@ -68,6 +68,7 @@ namespace AttributeCaching
 		}
 
 
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -75,14 +76,17 @@ namespace AttributeCaching
 		public override void OnEntry(MethodExecutionArgs args)
 		{
 			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
-			args.MethodExecutionTag = key;
 
 			object value = CacheFactory.Cache.Get (key);
 			if (value != null)
 			{
 				args.ReturnValue = value;
 				args.FlowBehavior = FlowBehavior.Return;
+				return;
 			}
+
+			var context= CacheScope.AddContext (key);
+			args.MethodExecutionTag = context;
 		}
 
 
@@ -93,7 +97,7 @@ namespace AttributeCaching
 		/// <param name="args"></param>
 		public override void OnSuccess(MethodExecutionArgs args)
 		{
-			string key = (string)args.MethodExecutionTag;
+			string key = ((CacheContext)args.MethodExecutionTag).CacheKey;
 			if (args.ReturnValue!= null)
 				CacheFactory.Cache.Add (key, args.ReturnValue, DateTimeOffset.Now.Add (lifeSpan));
 		}
@@ -106,12 +110,15 @@ namespace AttributeCaching
 		/// <param name="args"></param>
 		public override void OnExit(MethodExecutionArgs args)
 		{
-			// clear property Get cache
+			// clear cache for the property Get method
 			if (isPropertySetMethod)
 			{
 				string key = KeyBuilder.BuildKey(null, propertyGetMethodDeclaration, new int[0]);
 				CacheFactory.Cache.Remove(key);
 			}
+
+			if (args.MethodExecutionTag!= null)
+				CacheScope.RemoveContext();
 		}
 	}
 }

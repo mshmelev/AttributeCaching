@@ -60,9 +60,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CacheContextTest.cs" />
     <Compile Include="Helpers\IVisitor.cs" />
     <Compile Include="CacheInheritanceTest.cs" />
     <Compile Include="Helpers\TestClass.cs" />
+    <Compile Include="Helpers\TestContextClass.cs" />
     <Compile Include="RequiresPostSharp.cs" />
     <Compile Include="CacheableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
