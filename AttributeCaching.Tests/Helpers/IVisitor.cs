@@ -1,4 +1,4 @@
-﻿namespace AttributeCaching.Tests
+﻿namespace AttributeCaching.Tests.Helpers
 {
 	public interface IVisitor
 	{

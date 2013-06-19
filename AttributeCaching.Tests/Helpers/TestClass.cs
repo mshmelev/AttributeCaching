@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AttributeCaching.Tests
+namespace AttributeCaching.Tests.Helpers
 {
 	public class TestClass
 	{

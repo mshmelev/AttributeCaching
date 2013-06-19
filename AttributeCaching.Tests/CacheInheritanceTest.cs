@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Caching;
+using AttributeCaching.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
 
