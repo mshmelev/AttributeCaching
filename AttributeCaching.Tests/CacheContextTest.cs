@@ -3,7 +3,6 @@ using System.Runtime.Caching;
 using AttributeCaching.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
-using Rhino.Mocks.Constraints;
 
 namespace AttributeCaching.Tests
 {
