@@ -82,5 +82,15 @@ namespace AttributeCaching.Tests.Helpers
 			return "cached";
 		}
 
+
+		[Cacheable]
+		public string CalcDisableCaching()
+		{
+			visitor.Visit();
+			CacheScope.CurrentContext.DisableCaching();
+			return "cached";
+		}
+
+
 	}
 }

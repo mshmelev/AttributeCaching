@@ -96,7 +96,7 @@ namespace AttributeCaching
 		public override void OnSuccess(MethodExecutionArgs args)
 		{
 			var cacheContext = (CacheContext) args.MethodExecutionTag;
-			if (args.ReturnValue!= null)
+			if (args.ReturnValue != null && !cacheContext.IsCachingDisabled())
 				CacheFactory.Cache.Add (cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add (cacheContext.LifeSpan));
 		}
 

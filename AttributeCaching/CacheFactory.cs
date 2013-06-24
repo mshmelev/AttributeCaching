@@ -22,15 +22,13 @@ namespace AttributeCaching
 							cache = MemoryCache.Default;
 					}
 				}
-
 				return cache;
 			}
+
 			set
 			{
 				lock (sync)
-				{
 					cache = value;
-				}
 			}
 		}
 

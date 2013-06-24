@@ -69,6 +69,16 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void DisableCaching()
+		{
+			visitor.Expect (m => m.Visit()).Repeat.Twice();
+			testClass.CalcDisableCaching();
+			testClass.CalcDisableCaching();
+		}
+
+
+
 
 
 	}
