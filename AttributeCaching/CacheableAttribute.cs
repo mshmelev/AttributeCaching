@@ -13,18 +13,95 @@ namespace AttributeCaching
 		private string methodDeclaration;
 		private string propertyGetMethodDeclaration;
 		private bool isPropertySetMethod;
-		private readonly TimeSpan lifeSpan;
+		private TimeSpan lifeSpan;
 
 
+		/// <summary>
+		/// Default, specifies infinit cache lifetime
+		/// </summary>
 		public CacheableAttribute()
 		{
-			lifeSpan = TimeSpan.FromDays (36500);
+			lifeSpan = TimeSpan.MaxValue;
 		}
 
+		/// <summary>
+		/// Specifies cache lifetime in seconds
+		/// </summary>
+		/// <param name="lifeSpanSeconds">Cache lifetime in seconds</param>
 		public CacheableAttribute(double lifeSpanSeconds)
 		{
 			lifeSpan = TimeSpan.FromSeconds(lifeSpanSeconds);
 		}
+
+
+
+		/// <summary>
+		/// Gets/Sets cache lifetime in seconds.
+		/// Allows syntax: [Cacheable (Seconds = 30)]
+		/// </summary>
+		public double Seconds
+		{
+			get
+			{
+				return lifeSpan.TotalSeconds;
+			}
+			set
+			{
+				lifeSpan = TimeSpan.FromSeconds (value);
+			}
+		}
+
+
+		/// <summary>
+		/// Gets/Sets cache lifetime in minutes.
+		/// Allows syntax: [Cacheable (Minutes = 5)]
+		/// </summary>
+		public double Minutes
+		{
+			get
+			{
+				return lifeSpan.TotalMinutes;
+			}
+			set
+			{
+				lifeSpan = TimeSpan.FromMinutes (value);
+			}
+		}
+
+
+		/// <summary>
+		/// Gets/Sets cache lifetime in hours.
+		/// Allows syntax: [Cacheable (Hours = 5)]
+		/// </summary>
+		public double Hours
+		{
+			get
+			{
+				return lifeSpan.TotalHours;
+			}
+			set
+			{
+				lifeSpan = TimeSpan.FromHours (value);
+			}
+		}
+
+
+		/// <summary>
+		/// Gets/Sets cache lifetime in days.
+		/// Allows syntax: [Cacheable (Days = 2)]
+		/// </summary>
+		public double Days
+		{
+			get
+			{
+				return lifeSpan.TotalDays;
+			}
+			set
+			{
+				lifeSpan = TimeSpan.FromDays (value);
+			}
+		}
+
 
 
 
