@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Caching;
+using System.Threading.Tasks;
 using AttributeCaching.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
@@ -16,7 +17,7 @@ namespace AttributeCaching.Tests
 		[TestInitialize]
 		public void Init()
 		{
-			visitor = MockRepository.GenerateDynamicMockWithRemoting<IVisitor>();
+			visitor = MockRepository.GenerateStrictMockWithRemoting<IVisitor>();
 			testClass = new TestClass(visitor);
 		}
 
@@ -177,6 +178,5 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
 			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
 		}
-
 	}
 }
