@@ -8,8 +8,6 @@ namespace AttributeCaching
 		private static readonly object sync = new object();
 
 
-
-
 		public static ObjectCache Cache
 		{
 			get
@@ -24,7 +22,6 @@ namespace AttributeCaching
 				}
 				return cache;
 			}
-
 			set
 			{
 				lock (sync)

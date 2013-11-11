@@ -7,6 +7,9 @@ using PostSharp.Aspects;
 
 namespace AttributeCaching
 {
+	/// <summary>
+	/// Allows caching of a property, method, or a whole class.
+	/// </summary>
 	[Serializable]
 	public class CacheableAttribute : OnMethodBoundaryAspect
 	{
