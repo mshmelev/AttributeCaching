@@ -3,6 +3,16 @@ using System.Collections.Generic;
 
 namespace AttributeCaching
 {
+	/// <summary>
+	/// Allows to manage caching properties from within a cacheable method.
+	/// </summary>
+	/// <example>
+	/// object SomeCacheableMethod()
+	/// {
+	///		// ...
+	///		CacheScope.CurrentContext.DisableCaching();
+	/// }
+	/// </example>
 	public class CacheScope
 	{
 		[ThreadStatic]

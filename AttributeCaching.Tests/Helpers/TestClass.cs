@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace AttributeCaching.Tests.Helpers
 {
@@ -22,12 +23,14 @@ namespace AttributeCaching.Tests.Helpers
 			return prop1 + "_" + prop2;
 		}
 
+
 		[Cacheable]
 		public string Calc()
 		{
 			visitor.Visit();
 			return "noparam";
 		}
+
 
 		[Cacheable]
 		public string Calc2()
@@ -36,12 +39,14 @@ namespace AttributeCaching.Tests.Helpers
 			return "noparam2";
 		}
 
+
 		[Cacheable]
 		public string CalcOverloaded(int id)
 		{
 			visitor.Visit();
 			return "int_"+id;
 		}
+
 
 		[Cacheable]
 		public string CalcOverloaded(string id)
@@ -109,6 +114,35 @@ namespace AttributeCaching.Tests.Helpers
 			visitor.Visit(prop);
 			return prop;
 		}
+
+
+		[Cacheable]
+		public string CalcLongProcess(string prop)
+		{
+			visitor.Visit(prop);
+			Thread.Sleep (1000);		// emulate long calculations
+			return prop;
+		}
+
+		[Cacheable]
+		public string CalcLongProcessExceptions(string prop)
+		{
+			visitor.Visit(prop);
+			Thread.Sleep(100);		// emulate long calculations
+			throw new Exception();
+		}
+
+		[Cacheable(AllowSimultenousCalls = true)]
+		public string CalcLongProcessUnsynced(string prop)
+		{
+			visitor.Visit(prop);
+			Thread.Sleep (100);		// emulate long calculations
+			return prop;
+		}
+
+
+
+
 
 
 

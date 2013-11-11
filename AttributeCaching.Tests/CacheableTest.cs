@@ -178,5 +178,44 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
 			Assert.AreEqual("a1", testClass.CalcExpiring("a1"));
 		}
+
+
+
+		/// <summary>
+		/// Ensures that caching value is calculated only once by a function when multiple streams access the function simultaneously
+		/// </summary>
+		[TestMethod]
+		public void TestCacheLocks()
+		{
+			visitor.Expect (m => m.Visit ("a1")).Repeat.Once();
+
+			var t1= Task.Run (() => testClass.CalcLongProcess ("a1"));
+			var t2= Task.Run (() => testClass.CalcLongProcess ("a1"));
+			var t3= Task.Run (() => testClass.CalcLongProcess ("a1"));
+			Task.WaitAll (t1, t2, t3);
+		}
+
+		[TestMethod]
+		public void TestCacheLocksWithExceptions()
+		{
+			visitor.Expect(m => m.Visit("a1")).Repeat.Times(3);
+
+			var t1 = Task.Run(() => {try { testClass.CalcLongProcessExceptions ("a1"); } catch { } });
+			var t2 = Task.Run(() => {try { testClass.CalcLongProcessExceptions ("a1"); } catch { } });
+			var t3 = Task.Run(() => {try { testClass.CalcLongProcessExceptions ("a1"); } catch { } });
+			Task.WaitAll(t1, t2, t3);
+		}
+
+
+		[TestMethod]
+		public void TestCacheNoLocks()
+		{
+			visitor.Expect (m => m.Visit ("a1")).Repeat.Times(3);
+
+			var t1 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
+			var t2 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
+			var t3 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
+			Task.WaitAll (t1, t2, t3);
+		}
 	}
 }

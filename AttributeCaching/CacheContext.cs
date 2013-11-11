@@ -2,6 +2,10 @@
 
 namespace AttributeCaching
 {
+
+	/// <summary>
+	/// Represents a caching context for currently executing method. Accessible from CacheScope class.
+	/// </summary>
 	public class CacheContext
 	{
 		internal CacheContext(string cacheKey, TimeSpan lifeSpan)

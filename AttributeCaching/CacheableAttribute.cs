@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using AttributeCaching.Tools;
 using PostSharp.Aspects;
 
@@ -14,6 +15,7 @@ namespace AttributeCaching
 		private string propertyGetMethodDeclaration;
 		private bool isPropertySetMethod;
 		private TimeSpan lifeSpan;
+		private object syncMethodCall = new object();
 
 
 		/// <summary>
@@ -21,7 +23,7 @@ namespace AttributeCaching
 		/// </summary>
 		public CacheableAttribute()
 		{
-			lifeSpan = TimeSpan.MaxValue;
+			lifeSpan = TimeSpan.FromDays(365 * 1000);		// can't use TimeSpan.MaxValue because it will exceed DateTime.MaxValue
 		}
 
 		/// <summary>
@@ -103,6 +105,31 @@ namespace AttributeCaching
 		}
 
 
+		/// <summary>
+		/// Allows multiple simultaneous calls to the same cacheable method with the same parameters. Usually it's not needed to calculate the same cacheable value several times simultaneously.
+		/// Default value: false.
+		/// </summary>
+		public bool AllowSimultenousCalls
+		{
+			get
+			{
+				return (syncMethodCall == null);
+			}
+			set
+			{
+				if (value)
+				{
+					syncMethodCall = null;
+				}
+				else
+				{
+					if (syncMethodCall == null)
+						syncMethodCall = new object();
+				}
+			}
+		}
+
+
 
 
 		/// <summary>
@@ -150,9 +177,18 @@ namespace AttributeCaching
 		/// <param name="args"></param>
 		public override void OnEntry(MethodExecutionArgs args)
 		{
+			// trye to get from cache first
 			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
-
 			object value = CacheFactory.Cache.Get (key);
+
+			if (value == null && syncMethodCall != null)
+			{
+				Monitor.Enter (syncMethodCall);
+				value = CacheFactory.Cache.Get(key);			// value could have been alread put to the cache by other thread at this point
+				if (value!= null)
+					Monitor.Exit (syncMethodCall);
+			}
+
 			if (value != null)
 			{
 				args.ReturnValue = value;
@@ -160,6 +196,7 @@ namespace AttributeCaching
 				return;
 			}
 
+			// get value from the method itself
 			var context= CacheScope.AddContext (key, lifeSpan);
 			args.MethodExecutionTag = context;
 		}
@@ -178,19 +215,21 @@ namespace AttributeCaching
 		}
 
 
-
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="args"></param>
 		public override void OnExit(MethodExecutionArgs args)
 		{
-			// clear cache for the property Get method
+			// clear cache for the property's Get method if Set was called
 			if (isPropertySetMethod)
 			{
 				string key = KeyBuilder.BuildKey(null, propertyGetMethodDeclaration, new int[0]);
 				CacheFactory.Cache.Remove(key);
 			}
+
+			if (syncMethodCall!= null && Monitor.IsEntered(syncMethodCall))
+				Monitor.Exit (syncMethodCall);
 
 			if (args.MethodExecutionTag!= null)
 				CacheScope.RemoveContext();
