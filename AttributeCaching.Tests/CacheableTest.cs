@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
+using AttributeCaching.CacheAdapters;
 using AttributeCaching.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
@@ -27,7 +28,7 @@ namespace AttributeCaching.Tests
 		{
 			visitor.VerifyAllExpectations();
 			((IDisposable)CacheFactory.Cache).Dispose();
-			CacheFactory.Cache= new MemoryCache ("test");
+			CacheFactory.Cache = new MemoryCacheAdapter(new MemoryCache("test"));
 		}
 
 		

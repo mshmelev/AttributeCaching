@@ -1,14 +1,15 @@
 ﻿using System.Runtime.Caching;
+using AttributeCaching.CacheAdapters;
 
 namespace AttributeCaching
 {
 	public static class CacheFactory
 	{
-		private static ObjectCache cache;
+		private static CacheAdapter cache;
 		private static readonly object sync = new object();
 
 
-		public static ObjectCache Cache
+		public static CacheAdapter Cache
 		{
 			get
 			{
@@ -17,7 +18,7 @@ namespace AttributeCaching
 					lock (sync)
 					{
 						if (cache == null)
-							cache = MemoryCache.Default;
+							cache = new MemoryCacheAdapter (MemoryCache.Default);
 					}
 				}
 				return cache;

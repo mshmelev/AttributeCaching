@@ -24,18 +24,23 @@ namespace AttributeCaching
 		/// <summary>
 		/// Default, specifies infinit cache lifetime
 		/// </summary>
-		public CacheableAttribute()
+		/// <param name="dependencyTags"></param>
+		public CacheableAttribute(params string[] dependencyTags)
 		{
 			lifeSpan = TimeSpan.FromDays(365 * 1000);		// can't use TimeSpan.MaxValue because it will exceed DateTime.MaxValue
+			DependencyTags = dependencyTags;
 		}
+
 
 		/// <summary>
 		/// Specifies cache lifetime in seconds
 		/// </summary>
 		/// <param name="lifeSpanSeconds">Cache lifetime in seconds</param>
-		public CacheableAttribute(double lifeSpanSeconds)
+		/// <param name="dependencyTags"></param>
+		public CacheableAttribute(double lifeSpanSeconds, params string[] dependencyTags)
 		{
 			lifeSpan = TimeSpan.FromSeconds(lifeSpanSeconds);
+			DependencyTags = dependencyTags;
 		}
 
 
@@ -133,6 +138,13 @@ namespace AttributeCaching
 		}
 
 
+		public string[] DependencyTags
+		{
+			get;
+			set;
+		}
+
+
 
 
 		/// <summary>
@@ -214,7 +226,7 @@ namespace AttributeCaching
 		{
 			var cacheContext = (CacheContext) args.MethodExecutionTag;
 			if (args.ReturnValue != null && !cacheContext.IsCachingDisabled())
-				CacheFactory.Cache.Add (cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add (cacheContext.LifeSpan));
+				CacheFactory.Cache.Set (cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add (cacheContext.LifeSpan));
 		}
 
 

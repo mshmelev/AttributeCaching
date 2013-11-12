@@ -42,7 +42,7 @@
 			}
 		}
 
-		[Cacheable(0.01, AspectPriority = 1)]
+		[Cacheable(0.01, AttributeReplace = true)]
 		public string CalcCacheOverride()
 		{
 			visitor.Visit();

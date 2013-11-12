@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Caching;
+using AttributeCaching.CacheAdapters;
 using AttributeCaching.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
@@ -16,7 +17,7 @@ namespace AttributeCaching.Tests
 		[TestInitialize]
 		public void Init()
 		{
-			visitor = MockRepository.GenerateDynamicMockWithRemoting<IVisitor>();
+			visitor = MockRepository.GenerateStrictMockWithRemoting<IVisitor>();
 			testClass = new TestTopCacheClass(visitor);
 		}
 
@@ -26,7 +27,7 @@ namespace AttributeCaching.Tests
 		{
 			visitor.VerifyAllExpectations();
 			((IDisposable)CacheFactory.Cache).Dispose();
-			CacheFactory.Cache = new MemoryCache("test");
+			CacheFactory.Cache = new MemoryCacheAdapter(new MemoryCache("test"));
 		}
 
 
@@ -54,7 +55,7 @@ namespace AttributeCaching.Tests
 			Assert.AreEqual("cached", testClass.CalcCacheOverride());
 			Assert.AreEqual("cached", testClass.CalcCacheOverride());
 
-			System.Threading.Thread.Sleep (20);
+			System.Threading.Thread.Sleep(20);		// check the overriden life time is in effect
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			Assert.AreEqual("cached", testClass.CalcCacheOverride());
 			Assert.AreEqual("cached", testClass.CalcCacheOverride());
