@@ -116,6 +116,19 @@ namespace AttributeCaching.Tests
 		}
 
 
+		[TestMethod]
+		public void TestChangeDependencies()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCarChangingDependency(0);
+			testClass.GetCarChangingDependency(0);
+
+			CacheFactory.Cache.EvictAll("car_0");
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCarChangingDependency(0);
+			testClass.GetCarChangingDependency(0);
+		}
 
 	}
 }

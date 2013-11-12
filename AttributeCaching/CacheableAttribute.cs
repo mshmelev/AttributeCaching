@@ -138,13 +138,14 @@ namespace AttributeCaching
 		}
 
 
+		/// <summary>
+		/// List of tags the caching value is dependent on.
+		/// </summary>
 		public string[] DependencyTags
 		{
 			get;
 			set;
 		}
-
-
 
 
 		/// <summary>
@@ -212,7 +213,7 @@ namespace AttributeCaching
 			}
 
 			// get value from the method itself
-			var context= CacheScope.AddContext (key, lifeSpan);
+			var context= CacheScope.AddContext (key, lifeSpan, DependencyTags);
 			args.MethodExecutionTag = context;
 		}
 
@@ -226,7 +227,7 @@ namespace AttributeCaching
 		{
 			var cacheContext = (CacheContext) args.MethodExecutionTag;
 			if (args.ReturnValue != null && !cacheContext.IsCachingDisabled())
-				CacheFactory.Cache.Set (cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add (cacheContext.LifeSpan), DependencyTags);
+				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add(cacheContext.LifeSpan), cacheContext.DependencyTags);
 		}
 
 

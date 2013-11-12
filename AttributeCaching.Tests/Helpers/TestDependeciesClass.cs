@@ -29,8 +29,13 @@ namespace AttributeCaching.Tests.Helpers
 			return cars[car];
 		}
 
-
-
+		[Cacheable]
+		public string GetCarChangingDependency(int car)
+		{
+			visitor.Visit();
+			CacheScope.CurrentContext.DependencyTags.Add("car_"+car);
+			return cars[car];
+		}
 
 		public void Update (int car, string newName)
 		{

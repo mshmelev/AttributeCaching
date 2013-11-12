@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AttributeCaching
 {
@@ -7,13 +8,17 @@ namespace AttributeCaching
 	/// </summary>
 	public class CacheContext
 	{
-		internal CacheContext(string cacheKey, TimeSpan lifeSpan)
+		internal CacheContext(string cacheKey, TimeSpan lifeSpan, IEnumerable<string> dependencyTags)
 		{
 			CacheKey = cacheKey;
 			LifeSpan = lifeSpan;
+			DependencyTags = new List<string>(dependencyTags);
 		}
 
 
+		/// <summary>
+		/// Caching key for the currently executing method
+		/// </summary>
 		public string CacheKey
 		{
 			get;
@@ -22,7 +27,7 @@ namespace AttributeCaching
 
 
 		/// <summary>
-		/// Lifetime of the caching value
+		/// Lifetime of the caching value for the currently executing method
 		/// </summary>
 		public TimeSpan LifeSpan
 		{
@@ -32,7 +37,7 @@ namespace AttributeCaching
 
 
 		/// <summary>
-		/// Disable caching of the value
+		/// Disable caching for the currently executing method
 		/// </summary>
 		public void DisableCaching()
 		{
@@ -47,6 +52,16 @@ namespace AttributeCaching
 		public bool IsCachingDisabled()
 		{
 			return (LifeSpan == TimeSpan.Zero);
+		}
+
+
+		/// <summary>
+		/// Dependency tags for the currently executing method. Can be changed.
+		/// </summary>
+		public List<string> DependencyTags
+		{
+			get;
+			private set;
 		}
 	}
 }

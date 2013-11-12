@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AttributeCaching.CacheAdapters
 {
@@ -19,7 +20,20 @@ namespace AttributeCaching.CacheAdapters
 		/// <param name="value"></param>
 		/// <param name="absoluteExpiration"></param>
 		/// <param name="dependencyTags"></param>
-		public abstract void Set (string key, object value, DateTimeOffset absoluteExpiration, params string[] dependencyTags);
+		public void Set (string key, object value, DateTimeOffset absoluteExpiration, params string[] dependencyTags)
+		{
+			Set (key, value, absoluteExpiration, (IEnumerable<string>)dependencyTags);
+		}
+
+
+		/// <summary>
+		/// Adds object to cache
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
+		/// <param name="absoluteExpiration"></param>
+		/// <param name="dependencyTags"></param>
+		public abstract void Set(string key, object value, DateTimeOffset absoluteExpiration, IEnumerable<string> dependencyTags);
 
 
 		/// <summary>

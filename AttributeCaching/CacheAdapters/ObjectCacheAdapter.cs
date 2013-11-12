@@ -25,7 +25,7 @@ namespace AttributeCaching.CacheAdapters
 		}
 
 
-		public override void Set(string key, object value, DateTimeOffset absoluteExpiration, params string[] dependencyTags)
+		public override void Set(string key, object value, DateTimeOffset absoluteExpiration, IEnumerable<string> dependencyTags)
 		{
 			cache.Set (key, value, absoluteExpiration);
 			AddDependencyTags(key, dependencyTags);
