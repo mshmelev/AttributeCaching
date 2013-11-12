@@ -130,5 +130,43 @@ namespace AttributeCaching.Tests
 			testClass.GetCarChangingDependency(0);
 		}
 
+
+		[TestMethod]
+		public void TestEvictAny()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCars();
+			testClass.GetCars();
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCar(0);
+			testClass.GetCar(0);
+
+			CacheFactory.Cache.EvictAny("cars", "car_0", "car_1", "car_2");
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCars();
+			testClass.GetCars();
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCar(0);
+			testClass.GetCar(0);
+		}
+
+		[TestMethod]
+		public void TestEvictAnyNone()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Twice();
+			testClass.GetCars();
+			testClass.GetCar(0);
+
+			CacheFactory.Cache.EvictAny("car_5", "car_6");
+
+			visitor.Expect (m => m.Visit()).Repeat.Never();
+			testClass.GetCars();
+			testClass.GetCar(0);
+		}
+
+
 	}
 }

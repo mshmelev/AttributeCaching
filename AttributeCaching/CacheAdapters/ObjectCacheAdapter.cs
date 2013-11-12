@@ -85,5 +85,34 @@ namespace AttributeCaching.CacheAdapters
 					cache.Remove (key);
 			}
 		}
+
+
+
+		/// <summary>
+		/// Evicts all objects in cache which have ANY of passed tags
+		/// </summary>
+		/// <param name="dependencyTags"></param>
+		public override void EvictAny (params string[] dependencyTags)
+		{
+			HashSet<string> resultingSet = null;
+
+			foreach (var tag in dependencyTags)
+			{
+				HashSet<string> keys;
+				if (!tagKeysDependencies.TryGetValue(tag, out keys))
+					return;		// intersection will be empty anyway
+
+				if (resultingSet == null)
+					resultingSet = new HashSet<string>(keys);
+				else
+					resultingSet.UnionWith(keys);
+			}
+
+			if (resultingSet != null)
+			{
+				foreach (string key in resultingSet)
+					cache.Remove(key);
+			}
+		}
 	}
 }

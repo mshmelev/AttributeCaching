@@ -44,12 +44,17 @@ namespace AttributeCaching.CacheAdapters
 		public abstract object Remove (string key);
 
 
-
 		/// <summary>
 		/// Evicts all objects in cache which have ALL passed tags
 		/// </summary>
 		/// <param name="dependencyTags"></param>
 		public abstract void EvictAll (params string[] dependencyTags);
 
+	
+		/// <summary>
+		/// Evicts all objects in cache which have ANY of passed tags
+		/// </summary>
+		/// <param name="dependencyTags"></param>
+		public abstract void EvictAny (params string[] dependencyTags);
 	}
 }
