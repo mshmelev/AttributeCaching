@@ -120,7 +120,7 @@ namespace AttributeCaching.Tests.Helpers
 		public string CalcLongProcess(string prop)
 		{
 			visitor.Visit(prop);
-			Thread.Sleep (1000);		// emulate long calculations
+			Thread.Sleep (500);		// emulate long calculations
 			return prop;
 		}
 
