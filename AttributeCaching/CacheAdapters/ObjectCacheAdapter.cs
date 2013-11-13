@@ -99,13 +99,13 @@ namespace AttributeCaching.CacheAdapters
 			foreach (var tag in dependencyTags)
 			{
 				HashSet<string> keys;
-				if (!tagKeysDependencies.TryGetValue(tag, out keys))
-					return;		// intersection will be empty anyway
-
-				if (resultingSet == null)
-					resultingSet = new HashSet<string>(keys);
-				else
-					resultingSet.UnionWith(keys);
+				if (tagKeysDependencies.TryGetValue (tag, out keys))
+				{
+					if (resultingSet == null)
+						resultingSet = new HashSet<string> (keys);
+					else
+						resultingSet.UnionWith (keys);
+				}
 			}
 
 			if (resultingSet != null)

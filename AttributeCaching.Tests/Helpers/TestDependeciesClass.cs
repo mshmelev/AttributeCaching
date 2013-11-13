@@ -42,5 +42,18 @@ namespace AttributeCaching.Tests.Helpers
 			cars[car] = newName;
 			CacheFactory.Cache.EvictAll("cars");
 		}
+
+		[EvictCache("cars", "car_0", "junk")]
+		public void UpdateWithAttrAny (int car, string newName)
+		{
+			cars[car] = newName;
+		}
+
+		[EvictCache("cars", "car_0", UseAllTags = true)]
+		public void UpdateWithAttrAll (int car, string newName)
+		{
+			cars[car] = newName;
+		}
+
 	}
 }

@@ -100,7 +100,7 @@ namespace AttributeCaching.Tests
 
 
 		[TestMethod]
-		public void TestEvictNone()
+		public void TestEvictAllEmpty()
 		{
 			visitor.Expect(m => m.Visit()).Repeat.Twice();
 			testClass.GetCars();
@@ -112,6 +112,21 @@ namespace AttributeCaching.Tests
 			testClass.GetCar(0);
 
 			visitor.Expect(m => m.Visit()).Repeat.Never();
+			testClass.GetCars();
+		}
+
+
+		[TestMethod]
+		public void TestEvictAllNone()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Twice();
+			testClass.GetCars();
+			testClass.GetCar(0);
+
+			CacheFactory.Cache.EvictAll("junk");
+
+			visitor.Expect(m => m.Visit()).Repeat.Never();
+			testClass.GetCar(0);
 			testClass.GetCars();
 		}
 
@@ -142,7 +157,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCar(0);
 			testClass.GetCar(0);
 
-			CacheFactory.Cache.EvictAny("cars", "car_0", "car_1", "car_2");
+			CacheFactory.Cache.EvictAny("cars", "car_0", "car_1", "car_2", "junk");
 
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			testClass.GetCars();
@@ -166,6 +181,41 @@ namespace AttributeCaching.Tests
 			testClass.GetCars();
 			testClass.GetCar(0);
 		}
+
+
+		[TestMethod]
+		public void TestEvictAttrAny()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Twice();
+			testClass.GetCars();
+			testClass.GetCar(0);
+
+			testClass.UpdateWithAttrAny (0, "carAAA");
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCar(0);
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCars();
+		}
+
+
+		[TestMethod]
+		public void TestEvictAttrAll()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Twice();
+			testClass.GetCars();
+			testClass.GetCar(0);
+
+			testClass.UpdateWithAttrAll (0, "carAAA");
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCar(0);
+
+			visitor.Expect(m => m.Visit()).Repeat.Never();
+			testClass.GetCars();
+		}
+
 
 
 	}
