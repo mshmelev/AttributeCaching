@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace AttributeCaching.Tests.Helpers
@@ -58,6 +59,14 @@ namespace AttributeCaching.Tests.Helpers
 
 		[Cacheable]
 		public string CalcArray(string[] arr1, string[] arr2)
+		{
+			visitor.Visit(arr1, arr2);
+			return String.Join("_", arr1) + "," + String.Join("_", arr2);
+		}
+
+
+		[Cacheable]
+		public string CalcEnumerable (IEnumerable<string> arr1, IEnumerable<string> arr2)
 		{
 			visitor.Visit(arr1, arr2);
 			return String.Join("_", arr1) + "," + String.Join("_", arr2);

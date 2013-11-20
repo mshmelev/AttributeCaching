@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using AttributeCaching.CacheAdapters;
@@ -92,6 +93,19 @@ namespace AttributeCaching.Tests
 
 			Assert.AreEqual(",", testClass.CalcArray(new string[0], new string[0]));
 			Assert.AreEqual(",", testClass.CalcArray(new string[0], new string[0]));
+		}
+
+
+		[TestMethod]
+		public void TestEnumerables()
+		{
+			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(1);
+			Assert.AreEqual("a_b_c,d_e", testClass.CalcEnumerable(new List<string> { "a", "b", "c" }, new List<string> { "d", "e" }));
+			Assert.AreEqual("a_b_c,d_e", testClass.CalcEnumerable(new List<string> { "a", "b", "c" }, new List<string> { "d", "e" }));
+
+			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(1);
+			Assert.AreEqual(",", testClass.CalcEnumerable(new List<string>(), new List<string>()));
+			Assert.AreEqual(",", testClass.CalcEnumerable(new List<string>(), new List<string>()));
 		}
 
 

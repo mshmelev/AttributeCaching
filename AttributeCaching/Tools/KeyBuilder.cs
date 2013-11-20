@@ -63,7 +63,7 @@ namespace AttributeCaching.Tools
 			}
 
 			// all others
-			strVal = val .ToString();
+			strVal = val.ToString();
 			if (strVal.Length == 0)
 				strVal = EmptyStringReplacer;
 
