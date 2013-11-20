@@ -126,11 +126,12 @@ namespace AttributeCaching.Tests.Helpers
 
 
 		[Cacheable]
-		public string CalcLongProcess(string prop)
+		public DateTime CalcLongProcess(string prop)
 		{
+			DateTime t = DateTime.Now;
 			visitor.Visit(prop);
 			Thread.Sleep (500);		// emulate long calculations
-			return prop;
+			return t;
 		}
 
 		[Cacheable]

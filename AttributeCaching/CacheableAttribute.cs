@@ -18,7 +18,7 @@ namespace AttributeCaching
 		private string propertyGetMethodDeclaration;
 		private bool isPropertySetMethod;
 		private TimeSpan lifeSpan;
-		private object syncMethodCall = new object();
+		private bool syncMethodCall = true;
 
 
 		/// <summary>
@@ -121,19 +121,11 @@ namespace AttributeCaching
 		{
 			get
 			{
-				return (syncMethodCall == null);
+				return !syncMethodCall;
 			}
 			set
 			{
-				if (value)
-				{
-					syncMethodCall = null;
-				}
-				else
-				{
-					if (syncMethodCall == null)
-						syncMethodCall = new object();
-				}
+				syncMethodCall = !value;
 			}
 		}
 
@@ -197,12 +189,14 @@ namespace AttributeCaching
 			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
 			object value = CacheFactory.Cache.Get (key);
 
-			if (value == null && syncMethodCall != null)
+			if (value == null && syncMethodCall)
 			{
-				Monitor.Enter (syncMethodCall);
-				value = CacheFactory.Cache.Get(key);			// value could have been alread put to the cache by other thread at this point
+				string lockKey = String.Intern (key);
+				Monitor.Enter (lockKey);
+
+				value = CacheFactory.Cache.Get(key);			// value could have been already put to the cache by other thread at this point
 				if (value!= null)
-					Monitor.Exit (syncMethodCall);
+					Monitor.Exit (lockKey);
 			}
 
 			if (value != null)
@@ -244,11 +238,16 @@ namespace AttributeCaching
 				CacheFactory.Cache.Remove(key);
 			}
 
-			if (syncMethodCall!= null && Monitor.IsEntered(syncMethodCall))
-				Monitor.Exit (syncMethodCall);
+			if (args.MethodExecutionTag != null)
+			{
+				var context = (CacheContext) args.MethodExecutionTag;
 
-			if (args.MethodExecutionTag!= null)
+				string lockKey = String.Intern (context.CacheKey);
+				if (syncMethodCall && Monitor.IsEntered (lockKey))
+					Monitor.Exit (lockKey);
+
 				CacheScope.RemoveContext();
+			}
 		}
 	}
 }

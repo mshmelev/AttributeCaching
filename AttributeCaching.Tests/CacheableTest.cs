@@ -9,6 +9,7 @@ using Rhino.Mocks;
 
 namespace AttributeCaching.Tests
 {
+// ReSharper disable InconsistentNaming
 	[TestClass]
 	public class CacheableTest
 	{
@@ -211,6 +212,37 @@ namespace AttributeCaching.Tests
 		}
 
 		[TestMethod]
+		public void TestCacheNotLockable()
+		{
+			visitor.Expect(m => m.Visit("a1")).Repeat.Times(3);	// would be only one call if calls are syncrounous
+
+			var t1 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
+			var t2 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
+			var t3 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
+			Task.WaitAll(t1, t2, t3);
+		}
+
+
+
+		[TestMethod]
+		public void Test_Cache_No_Locks_If_Different_Params()
+		{
+			visitor.Expect(m => m.Visit()).IgnoreArguments().Repeat.Times(3);
+
+			DateTime d1, d2, d3;
+			d1 = d2 = d3 = DateTime.Now;
+			var t1 = Task.Run(() => d1= testClass.CalcLongProcess("a1"));
+			var t2 = Task.Run(() => d2= testClass.CalcLongProcess("a2"));
+			var t3 = Task.Run(() => d3= testClass.CalcLongProcess("a3"));
+			Task.WaitAll(t1, t2, t3);
+
+			Assert.IsTrue (Math.Abs ((d2-d1).TotalMilliseconds)< 500, "Lock occured");
+			Assert.IsTrue (Math.Abs ((d3-d1).TotalMilliseconds)< 500, "Lock occured");
+			Assert.IsTrue (Math.Abs ((d3-d2).TotalMilliseconds)< 500, "Lock occured");
+		}
+
+
+		[TestMethod]
 		public void TestCacheLocksWithExceptions()
 		{
 			visitor.Expect(m => m.Visit("a1")).Repeat.Times(3);
@@ -222,15 +254,6 @@ namespace AttributeCaching.Tests
 		}
 
 
-		[TestMethod]
-		public void TestCacheNoLocks()
-		{
-			visitor.Expect (m => m.Visit ("a1")).Repeat.Times(3);
-
-			var t1 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
-			var t2 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
-			var t3 = Task.Run(() => testClass.CalcLongProcessUnsynced("a1"));
-			Task.WaitAll (t1, t2, t3);
-		}
 	}
+// ReSharper restore InconsistentNaming
 }
