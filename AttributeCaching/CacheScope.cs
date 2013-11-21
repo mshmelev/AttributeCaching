@@ -34,6 +34,9 @@ namespace AttributeCaching
 		}
 
 
+		/// <summary>
+		/// CacheContext for currently executing method
+		/// </summary>
 		public static CacheContext CurrentContext
 		{
 			get

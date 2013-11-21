@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace AttributeCaching.CacheAdapters
 {
+	/// <summary>
+	/// Base adapter for different cache implementations
+	/// </summary>
 	public abstract class CacheAdapter
 	{
 		/// <summary>

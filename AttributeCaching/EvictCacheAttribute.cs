@@ -13,6 +13,10 @@ namespace AttributeCaching
 		private readonly string[] dependencyTags;
 		
 
+		/// <summary>
+		/// Evicts cache by passed dependency tags
+		/// </summary>
+		/// <param name="dependencyTags"></param>
 		public EvictCacheAttribute(params string[] dependencyTags)
 		{
 			this.dependencyTags = dependencyTags;
@@ -30,6 +34,10 @@ namespace AttributeCaching
 		}
 
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="args"></param>
 		public override void OnExit (MethodExecutionArgs args)
 		{
 			if (UseAllTags)

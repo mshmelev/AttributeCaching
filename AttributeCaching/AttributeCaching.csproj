@@ -35,6 +35,7 @@
     <WarningLevel>4</WarningLevel>
     <PostSharpTargetProcessor>x64</PostSharpTargetProcessor>
     <SkipPostSharp>True</SkipPostSharp>
+    <DocumentationFile>bin\Release\AttributeCaching.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PostSharp, Version=3.0.40.9, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
