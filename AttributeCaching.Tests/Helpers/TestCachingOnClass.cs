@@ -1,12 +1,12 @@
 ﻿namespace AttributeCaching.Tests.Helpers
 {
 	[Cacheable]
-	public class TestTopCacheClass
+	public class TestCachingOnClass
 	{
 		private readonly IVisitor visitor;
 
 		[Cacheable(AttributeExclude = true)]
-		public TestTopCacheClass(IVisitor visitor)
+		public TestCachingOnClass(IVisitor visitor)
 		{
 			this.visitor = visitor;
 		}

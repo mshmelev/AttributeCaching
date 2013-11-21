@@ -11,14 +11,14 @@ namespace AttributeCaching.Tests
 	public class CacheInheritanceTest
 	{
 		private IVisitor visitor;
-		private TestTopCacheClass testClass;
+		private TestCachingOnClass testClass;
 
 
 		[TestInitialize]
 		public void Init()
 		{
 			visitor = MockRepository.GenerateStrictMockWithRemoting<IVisitor>();
-			testClass = new TestTopCacheClass(visitor);
+			testClass = new TestCachingOnClass(visitor);
 		}
 
 

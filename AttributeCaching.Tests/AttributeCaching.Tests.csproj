@@ -69,7 +69,7 @@
     <Compile Include="Helpers\TestDependeciesClass.cs" />
     <Compile Include="CacheableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\TestTopCacheClass.cs" />
+    <Compile Include="Helpers\TestCachingOnClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AttributeCaching\AttributeCaching.csproj">
