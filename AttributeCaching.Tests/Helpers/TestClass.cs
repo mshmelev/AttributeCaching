@@ -142,7 +142,7 @@ namespace AttributeCaching.Tests.Helpers
 			throw new Exception();
 		}
 
-		[Cacheable(AllowSimultenousCalls = true)]
+		[Cacheable(AllowConcurrentCalls = true)]
 		public string CalcLongProcessUnsynced(string prop)
 		{
 			visitor.Visit(prop);

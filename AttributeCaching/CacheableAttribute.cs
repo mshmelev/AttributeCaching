@@ -117,7 +117,7 @@ namespace AttributeCaching
 		/// Allows multiple simultaneous calls to the same cacheable method with the same parameters. Usually it's not needed to calculate the same cacheable value several times simultaneously.
 		/// Default value: false.
 		/// </summary>
-		public bool AllowSimultenousCalls
+		public bool AllowConcurrentCalls
 		{
 			get
 			{
