@@ -145,6 +145,33 @@ namespace AttributeCaching.Tests
 			testClass.GetCarChangingDependency(0);
 		}
 
+		[TestMethod]
+		public void TestUpdateExistingDependencies()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCarUpdatingDependency(0);
+			testClass.GetCarUpdatingDependency(0);
+
+			CacheFactory.Cache.EvictAll("car_0");
+
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCarUpdatingDependency(0);
+			testClass.GetCarUpdatingDependency(0);
+		}
+
+		[TestMethod]
+		public void TestUpdateNonExistingDependencies()
+		{
+			visitor.Expect(m => m.Visit()).Repeat.Once();
+			testClass.GetCarUpdatingNonExistingDependency (0);
+			testClass.GetCarUpdatingNonExistingDependency (0);
+
+			CacheFactory.Cache.EvictAny("car_0", "carM_0");
+
+			visitor.Expect (m => m.Visit()).Repeat.Never();
+			testClass.GetCarUpdatingNonExistingDependency(0);
+		}
+
 
 		[TestMethod]
 		public void TestEvictAny()
