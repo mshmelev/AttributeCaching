@@ -141,6 +141,17 @@ namespace AttributeCaching
 
 
 		/// <summary>
+		/// Specifies if value should be also cached locally. Should be used with distributed caching systems like AppFabric, useless for <see cref="AttributeCaching.CacheAdapters.MemoryCacheAdapter"/>.
+		/// Default value: false.
+		/// </summary>
+		public bool CacheLocally
+		{
+			get;
+			set;
+		}
+
+
+		/// <summary>
 		/// Precalculate some parameters, method is invoked once during the compilation
 		/// </summary>
 		/// <param name="method"></param>
