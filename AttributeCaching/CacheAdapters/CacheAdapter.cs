@@ -22,12 +22,12 @@ namespace AttributeCaching.CacheAdapters
 		/// </summary>
 		/// <param name="key"></param>
 		/// <param name="value"></param>
-		/// <param name="absoluteExpiration"></param>
+		/// <param name="lifeSpan"></param>
 		/// <param name="cacheName">pass null for default cache</param>
 		/// <param name="dependencyTags"></param>
-		public void Set (string key, object value, DateTimeOffset absoluteExpiration, string cacheName, params string[] dependencyTags)
+		public void Set(string key, object value, TimeSpan lifeSpan, string cacheName, params string[] dependencyTags)
 		{
-			Set (key, value, absoluteExpiration, cacheName, (IEnumerable<string>)dependencyTags);
+			Set(key, value, lifeSpan, cacheName, (IEnumerable<string>)dependencyTags);
 		}
 
 
@@ -36,10 +36,10 @@ namespace AttributeCaching.CacheAdapters
 		/// </summary>
 		/// <param name="key"></param>
 		/// <param name="value"></param>
-		/// <param name="absoluteExpiration"></param>
+		/// <param name="lifeSpan"></param>
 		/// <param name="cacheName">pass null for default cache</param>
 		/// <param name="dependencyTags"></param>
-		public abstract void Set(string key, object value, DateTimeOffset absoluteExpiration, string cacheName, IEnumerable<string> dependencyTags);
+		public abstract void Set(string key, object value, TimeSpan lifeSpan, string cacheName, IEnumerable<string> dependencyTags);
 
 
 		/// <summary>

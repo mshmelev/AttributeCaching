@@ -232,7 +232,7 @@ namespace AttributeCaching
 		{
 			var cacheContext = (CacheContext) args.MethodExecutionTag;
 			if (args.ReturnValue != null && !cacheContext.IsCachingDisabled())
-				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add(cacheContext.LifeSpan), CacheName, cacheContext.DependencyTags);
+				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, cacheContext.LifeSpan, CacheName, cacheContext.DependencyTags);
 		}
 
 

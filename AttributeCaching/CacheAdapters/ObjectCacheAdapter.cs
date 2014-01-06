@@ -21,9 +21,9 @@ namespace AttributeCaching.CacheAdapters
 		}
 
 
-		public override void Set(string key, object value, DateTimeOffset absoluteExpiration, string cacheName, IEnumerable<string> dependencyTags)
+		public override void Set(string key, object value, TimeSpan lifeSpan, string cacheName, IEnumerable<string> dependencyTags)
 		{
-			GetCache(cacheName).Set(key, value, absoluteExpiration);
+			GetCache(cacheName).Set(key, value, DateTimeOffset.UtcNow.Add (lifeSpan));
 			AddDependencyTags(key, cacheName, dependencyTags);
 		}
 
