@@ -24,11 +24,11 @@ namespace AttributeCaching.CacheAdapters
 		public override void Set(string key, object value, TimeSpan lifeSpan, string cacheName, IEnumerable<string> dependencyTags)
 		{
 			GetCache(cacheName).Set(key, value, DateTimeOffset.UtcNow.Add (lifeSpan));
-			AddDependencyTags(key, cacheName, dependencyTags);
+			AddDependencyTags(key, dependencyTags);
 		}
 
 
-		protected void AddDependencyTags(string key, string cacheName, IEnumerable<string> dependencyTags)
+		protected void AddDependencyTags(string key, IEnumerable<string> dependencyTags)
 		{
 			foreach (var tag in dependencyTags)
 			{
