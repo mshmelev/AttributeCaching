@@ -78,8 +78,9 @@ namespace AttributeCaching.CacheAdapters
 
 			if (resultingSet != null)
 			{
+				var cache = GetCache(cacheName);
 				foreach (string key in resultingSet)
-					GetCache(cacheName).Remove(key);
+					cache.Remove(key);
 			}
 		}
 
@@ -91,25 +92,18 @@ namespace AttributeCaching.CacheAdapters
 		/// <param name="dependencyTags"></param>
 		public override void EvictAny (string cacheName, params string[] dependencyTags)
 		{
-			HashSet<string> resultingSet = null;
+			var resultingSet = new HashSet<string>();
 
 			foreach (var tag in dependencyTags)
 			{
 				HashSet<string> keys;
 				if (tagKeysDependencies.TryGetValue (tag, out keys))
-				{
-					if (resultingSet == null)
-						resultingSet = new HashSet<string> (keys);
-					else
-						resultingSet.UnionWith (keys);
-				}
+					resultingSet.UnionWith (keys);
 			}
 
-			if (resultingSet != null)
-			{
-				foreach (string key in resultingSet)
-					GetCache(cacheName).Remove(key);
-			}
+			var cache = GetCache(cacheName);
+			foreach (string key in resultingSet)
+				cache.Remove(key);
 		}
 	}
 }
