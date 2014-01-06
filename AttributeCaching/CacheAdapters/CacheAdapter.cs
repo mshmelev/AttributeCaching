@@ -47,8 +47,8 @@ namespace AttributeCaching.CacheAdapters
 		/// </summary>
 		/// <param name="key"></param>
 		/// <param name="cacheName">pass null for default cache</param>
-		/// <returns>An object that represents the value of the removed cache entry that was specified by the key, or null if the specified entry was not found</returns>
-		public abstract object Remove(string key, string cacheName);
+		/// <returns>true if object was found, false if object is missing</returns>
+		public abstract bool Remove(string key, string cacheName);
 
 
 		/// <summary>

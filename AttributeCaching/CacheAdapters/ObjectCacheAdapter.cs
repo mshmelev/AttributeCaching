@@ -49,9 +49,9 @@ namespace AttributeCaching.CacheAdapters
 		}
 
 
-		public override object Remove(string key, string cacheName)
+		public override bool Remove(string key, string cacheName)
 		{
-			return GetCache(cacheName).Remove(key);
+			return GetCache(cacheName).Remove(key)!= null;
 		}
 
 
