@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Caching;
 using AttributeCaching.CacheAdapters;
 using AttributeCaching.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -27,7 +26,7 @@ namespace AttributeCaching.Tests
 		{
 			visitor.VerifyAllExpectations();
 			((IDisposable)CacheFactory.Cache).Dispose();
-			CacheFactory.Cache = new MemoryCacheAdapter (new MemoryCache("test"));
+			CacheFactory.Cache = new MemoryCacheAdapter ();
 		}
 
 
@@ -88,7 +87,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCar(1);
 			testClass.GetCar(1);
 
-			CacheFactory.Cache.EvictAll ("car_1");
+			CacheFactory.Cache.EvictAll(null, "car_1");
 
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			testClass.GetCar(1);
@@ -106,7 +105,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCars();
 			testClass.GetCar(0);
 
-			CacheFactory.Cache.EvictAll("cars", "car_0");
+			CacheFactory.Cache.EvictAll(null, "cars", "car_0");
 
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			testClass.GetCar(0);
@@ -123,7 +122,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCars();
 			testClass.GetCar(0);
 
-			CacheFactory.Cache.EvictAll("junk");
+			CacheFactory.Cache.EvictAll(null, "junk");
 
 			visitor.Expect(m => m.Visit()).Repeat.Never();
 			testClass.GetCar(0);
@@ -138,7 +137,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCarChangingDependency(0);
 			testClass.GetCarChangingDependency(0);
 
-			CacheFactory.Cache.EvictAll("car_0");
+			CacheFactory.Cache.EvictAll(null, "car_0");
 
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			testClass.GetCarChangingDependency(0);
@@ -152,7 +151,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCarUpdatingDependency(0);
 			testClass.GetCarUpdatingDependency(0);
 
-			CacheFactory.Cache.EvictAll("car_0");
+			CacheFactory.Cache.EvictAll(null, "car_0");
 
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			testClass.GetCarUpdatingDependency(0);
@@ -166,7 +165,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCarUpdatingNonExistingDependency (0);
 			testClass.GetCarUpdatingNonExistingDependency (0);
 
-			CacheFactory.Cache.EvictAny("car_0", "carM_0");
+			CacheFactory.Cache.EvictAny(null, "car_0", "carM_0");
 
 			visitor.Expect (m => m.Visit()).Repeat.Never();
 			testClass.GetCarUpdatingNonExistingDependency(0);
@@ -184,7 +183,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCar(0);
 			testClass.GetCar(0);
 
-			CacheFactory.Cache.EvictAny("cars", "car_0", "car_1", "car_2", "junk");
+			CacheFactory.Cache.EvictAny(null, "cars", "car_0", "car_1", "car_2", "junk");
 
 			visitor.Expect(m => m.Visit()).Repeat.Once();
 			testClass.GetCars();
@@ -202,7 +201,7 @@ namespace AttributeCaching.Tests
 			testClass.GetCars();
 			testClass.GetCar(0);
 
-			CacheFactory.Cache.EvictAny("car_5", "car_6");
+			CacheFactory.Cache.EvictAny(null, "car_5", "car_6");
 
 			visitor.Expect (m => m.Visit()).Repeat.Never();
 			testClass.GetCars();

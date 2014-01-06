@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Caching;
 using System.Threading.Tasks;
 using AttributeCaching.CacheAdapters;
 using AttributeCaching.Tests.Helpers;
@@ -30,7 +29,7 @@ namespace AttributeCaching.Tests
 		{
 			visitor.VerifyAllExpectations();
 			((IDisposable)CacheFactory.Cache).Dispose();
-			CacheFactory.Cache = new MemoryCacheAdapter(new MemoryCache("test"));
+			CacheFactory.Cache = new MemoryCacheAdapter();
 		}
 
 		

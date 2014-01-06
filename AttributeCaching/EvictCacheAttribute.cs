@@ -35,15 +35,26 @@ namespace AttributeCaching
 
 
 		/// <summary>
+		/// Specifies cache name/region/area. Can be used to store values in different cache storages.
+		/// Default value: null.
+		/// </summary>
+		public string CacheName
+		{
+			get;
+			set;
+		}
+
+
+		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="args"></param>
 		public override void OnExit (MethodExecutionArgs args)
 		{
 			if (UseAllTags)
-				CacheFactory.Cache.EvictAll (dependencyTags);
+				CacheFactory.Cache.EvictAll (CacheName, dependencyTags);
 			else
-				CacheFactory.Cache.EvictAny (dependencyTags);
+				CacheFactory.Cache.EvictAny (CacheName, dependencyTags);
 		}
 	}
 }

@@ -9,30 +9,26 @@ namespace AttributeCaching.CacheAdapters
 	/// </summary>
 	internal abstract class ObjectCacheAdapter : CacheAdapter
 	{
-		protected ObjectCache cache;
 		protected readonly Dictionary<string,HashSet<string>> tagKeysDependencies = new Dictionary<string, HashSet<string>>();
 
 
-		protected ObjectCacheAdapter(ObjectCache cache)
+		protected abstract ObjectCache GetCache (string cacheName);
+
+
+		public override object Get(string key, string cacheName)
 		{
-			this.cache = cache;
+			return GetCache (cacheName).Get(key);
 		}
 
 
-		public override object Get (string key)
+		public override void Set(string key, object value, DateTimeOffset absoluteExpiration, string cacheName, IEnumerable<string> dependencyTags)
 		{
-			return cache.Get (key);
+			GetCache(cacheName).Set(key, value, absoluteExpiration);
+			AddDependencyTags(key, cacheName, dependencyTags);
 		}
 
 
-		public override void Set(string key, object value, DateTimeOffset absoluteExpiration, IEnumerable<string> dependencyTags)
-		{
-			cache.Set (key, value, absoluteExpiration);
-			AddDependencyTags(key, dependencyTags);
-		}
-
-
-		protected void AddDependencyTags (string key, IEnumerable<string> dependencyTags)
+		protected void AddDependencyTags(string key, string cacheName, IEnumerable<string> dependencyTags)
 		{
 			foreach (var tag in dependencyTags)
 			{
@@ -53,17 +49,18 @@ namespace AttributeCaching.CacheAdapters
 		}
 
 
-		public override object Remove (string key)
+		public override object Remove(string key, string cacheName)
 		{
-			return cache.Remove (key);
+			return GetCache(cacheName).Remove(key);
 		}
 
 
 		/// <summary>
 		/// Evicts all objects in cache which have ALL passed tags
 		/// </summary>
+		/// <param name="cacheName"></param>
 		/// <param name="dependencyTags"></param>
-		public override void EvictAll (params string[] dependencyTags)
+		public override void EvictAll (string cacheName, params string[] dependencyTags)
 		{
 			HashSet<string> resultingSet = null;
 
@@ -82,17 +79,17 @@ namespace AttributeCaching.CacheAdapters
 			if (resultingSet != null)
 			{
 				foreach (string key in resultingSet)
-					cache.Remove (key);
+					GetCache(cacheName).Remove(key);
 			}
 		}
-
 
 
 		/// <summary>
 		/// Evicts all objects in cache which have ANY of passed tags
 		/// </summary>
+		/// <param name="cacheName"></param>
 		/// <param name="dependencyTags"></param>
-		public override void EvictAny (params string[] dependencyTags)
+		public override void EvictAny (string cacheName, params string[] dependencyTags)
 		{
 			HashSet<string> resultingSet = null;
 
@@ -111,7 +108,7 @@ namespace AttributeCaching.CacheAdapters
 			if (resultingSet != null)
 			{
 				foreach (string key in resultingSet)
-					cache.Remove(key);
+					GetCache(cacheName).Remove(key);
 			}
 		}
 	}

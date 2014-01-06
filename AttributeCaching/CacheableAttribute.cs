@@ -141,10 +141,10 @@ namespace AttributeCaching
 
 
 		/// <summary>
-		/// Specifies if value should be also cached locally. Should be used with distributed caching systems like AppFabric, useless for <see cref="AttributeCaching.CacheAdapters.MemoryCacheAdapter"/>.
-		/// Default value: false.
+		/// Specifies cache name/region/area. Can be used to store values in different cache storages.
+		/// Default value: null.
 		/// </summary>
-		public bool CacheLocally
+		public string CacheName
 		{
 			get;
 			set;
@@ -198,14 +198,14 @@ namespace AttributeCaching
 		{
 			// trye to get from cache first
 			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
-			object value = CacheFactory.Cache.Get (key);
+			object value = CacheFactory.Cache.Get (key, CacheName);
 
 			if (value == null && syncMethodCall)
 			{
 				string lockKey = String.Intern (key);
 				Monitor.Enter (lockKey);
 
-				value = CacheFactory.Cache.Get(key);			// value could have been already put to the cache by other thread at this point
+				value = CacheFactory.Cache.Get(key, CacheName);			// value could have been already put to the cache by other thread at this point
 				if (value!= null)
 					Monitor.Exit (lockKey);
 			}
@@ -232,7 +232,7 @@ namespace AttributeCaching
 		{
 			var cacheContext = (CacheContext) args.MethodExecutionTag;
 			if (args.ReturnValue != null && !cacheContext.IsCachingDisabled())
-				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add(cacheContext.LifeSpan), cacheContext.DependencyTags);
+				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, DateTimeOffset.Now.Add(cacheContext.LifeSpan), CacheName, cacheContext.DependencyTags);
 		}
 
 
@@ -246,7 +246,7 @@ namespace AttributeCaching
 			if (isPropertySetMethod)
 			{
 				string key = KeyBuilder.BuildKey(null, propertyGetMethodDeclaration, new int[0]);
-				CacheFactory.Cache.Remove(key);
+				CacheFactory.Cache.Remove(key, CacheName);
 			}
 
 			if (args.MethodExecutionTag != null)

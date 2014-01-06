@@ -24,7 +24,7 @@ namespace AttributeCaching
 					lock (sync)
 					{
 						if (cache == null)
-							cache = new MemoryCacheAdapter (MemoryCache.Default);
+							cache = new MemoryCacheAdapter();
 					}
 				}
 				return cache;

@@ -56,7 +56,7 @@ namespace AttributeCaching.Tests.Helpers
 		public void Update (int car, string newName)
 		{
 			cars[car] = newName;
-			CacheFactory.Cache.EvictAll("cars");
+			CacheFactory.Cache.EvictAll(null, "cars");
 		}
 
 		[EvictCache("cars", "car_0", "junk")]

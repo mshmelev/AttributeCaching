@@ -62,8 +62,10 @@
   <ItemGroup>
     <Compile Include="CacheContextTest.cs" />
     <Compile Include="CacheDependenciesTest.cs" />
+    <Compile Include="CacheNamesTest.cs" />
     <Compile Include="Helpers\IVisitor.cs" />
     <Compile Include="CacheInheritanceTest.cs" />
+    <Compile Include="Helpers\TestCacheNamesClass.cs" />
     <Compile Include="Helpers\TestClass.cs" />
     <Compile Include="Helpers\TestContextClass.cs" />
     <Compile Include="Helpers\TestDependeciesClass.cs" />
