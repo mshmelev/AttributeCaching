@@ -5,7 +5,7 @@ using System.Runtime.Caching;
 namespace AttributeCaching.CacheAdapters
 {
 	/// <summary>
-	/// Adapter for .NET Framork native ObjectCache provider
+	/// Adapter for .NET Framework native ObjectCache provider
 	/// </summary>
 	internal abstract class ObjectCacheAdapter : CacheAdapter
 	{
@@ -44,7 +44,8 @@ namespace AttributeCaching.CacheAdapters
 						}
 					}
 				}
-				keys.Add (key);
+				lock (keys)
+					keys.Add (key);
 			}
 		}
 
