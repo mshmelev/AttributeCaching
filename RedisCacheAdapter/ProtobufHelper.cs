@@ -7,7 +7,10 @@ using ProtoBuf.Meta;
 
 namespace AttributeCaching.CacheAdapters
 {
-	public static class ProtoBufHelper
+	/// <summary>
+	/// Helps to serialize and deserialize custom classes.
+	/// </summary>
+	internal static class ProtoBufHelper
 	{
 		private static readonly RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
 		private static readonly HashSet<Type> knownTypes = new HashSet<Type>();
