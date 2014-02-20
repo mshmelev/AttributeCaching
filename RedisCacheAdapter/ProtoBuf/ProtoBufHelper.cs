@@ -111,6 +111,8 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 		private static void AddTypeAsSerializable(Type type)
 		{
 			type = GetEnumerableElementType(type);
+			if (Nullable.GetUnderlyingType(type) != null)
+				type = Nullable.GetUnderlyingType(type);
 
 			var metaType = runtimeTypeModel.Add(type, false);
 			var fields = type.GetMembers(BindingFlags.Instance | BindingFlags.Public);
@@ -130,17 +132,27 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 
 		private static bool IsKnownType(Type type)
 		{
-			if (type== null || knownTypes.Contains(type))
+			if (type == null || knownTypes.Contains(type))
 				return true;
 
-			if (runtimeTypeModel.IsDefined (type))
+			// proto-buf natively supported
+			if (runtimeTypeModel.IsDefined(type))
 			{
-				knownTypes.Add (type);
+				knownTypes.Add(type);
 				return true;
 			}
 
+			// enumerables
 			var elementType = GetEnumerableElementType(type);
-			if (elementType!= type && IsKnownType (elementType))
+			if (elementType != type && IsKnownType(elementType))
+			{
+				knownTypes.Add(type);
+				return true;
+			}
+
+			// nullables
+			var nullType = Nullable.GetUnderlyingType(type);
+			if (nullType != null && IsKnownType(nullType))
 			{
 				knownTypes.Add(type);
 				return true;
