@@ -76,7 +76,7 @@ namespace AttributeCaching.CacheAdapters
 					redis = new RedisConnection(servers[curServer].Host, servers[curServer].Port);
 					redis.Error += OnRedisError;
 					redis.Closed += OnRedisClosed;
-					redis.Open();
+					redis.Open().Wait();
 
 					subChannel = redis.GetOpenSubscriberChannel();
 					subChannel.Error += OnRedisError;
