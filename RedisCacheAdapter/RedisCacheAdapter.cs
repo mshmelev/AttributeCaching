@@ -72,8 +72,6 @@ namespace AttributeCaching.CacheAdapters
 					if (curServer >= servers.Length)
 						curServer = 0;
 
-					Console.WriteLine("Openning #{0}", curServer);
-
 					redis = new RedisConnection(servers[curServer].Host, servers[curServer].Port);
 					redis.Error += OnRedisError;
 					redis.Closed += OnRedisClosed;
@@ -250,7 +248,6 @@ namespace AttributeCaching.CacheAdapters
 			try
 			{
 				string key = GetKey(keyBytes);
-				Console.WriteLine("Expire: " + key);
 
 				if (memoryCache.Contains(key))
 				{
@@ -284,7 +281,6 @@ namespace AttributeCaching.CacheAdapters
 			try
 			{
 				string key = GetKey(keyBytes);
-				Console.WriteLine("Deleted: " + key);
 				memoryCache.Remove(key);
 			}
 			catch (Exception ex)
@@ -297,7 +293,6 @@ namespace AttributeCaching.CacheAdapters
 
 		private void OnRedisError(object sender, ErrorEventArgs errorEventArgs)
 		{
-			Console.WriteLine("Error: {0}, {1}", errorEventArgs.Cause, errorEventArgs.Exception);
 			if (OnError != null)
 				OnError(this, errorEventArgs.Exception);
 		}
