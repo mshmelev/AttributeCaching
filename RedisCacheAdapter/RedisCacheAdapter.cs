@@ -21,7 +21,7 @@ namespace AttributeCaching.CacheAdapters
 	{
 		private const int CacheDb = 0;
 		private const int TagsDb = 1;
-		private readonly TimeSpan RecentHistoryLifetime = TimeSpan.FromSeconds (1);
+		private readonly TimeSpan RecentHistoryLifetime = TimeSpan.FromSeconds (2);
 
 		private readonly RedisServer[] servers;
 		private int curServer = -1;
@@ -61,14 +61,6 @@ namespace AttributeCaching.CacheAdapters
 			{
 				lock (sync)
 				{
-					if (memoryCache != null)
-						memoryCache.Dispose();
-					memoryCache = new MemoryCache("RedisCacheAdapter.InternalCache");
-
-					if (recentKeys != null)
-						recentKeys.Dispose();
-					recentKeys = new MemoryCache("RedisCacheAdapter.RecentKeys");
-
 					++curServer;
 					if (curServer >= servers.Length)
 						curServer = 0;
@@ -82,6 +74,7 @@ namespace AttributeCaching.CacheAdapters
 					subChannel.Error += OnRedisError;
 					subChannel.Subscribe(String.Format("__keyevent@{0}__:del", CacheDb), OnRemoteKeyDeleted);
 					subChannel.Subscribe(String.Format("__keyevent@{0}__:expire", CacheDb), OnRemoteKeyExpirationSet);		// expire event is enough, as far as SETEX redis command is only used to set values
+					subChannel.Subscribe("__flushed", OnRemoteFlushed);					// not a system message, should be published manually
 
 					isInited = true;
 					return true;
@@ -95,6 +88,18 @@ namespace AttributeCaching.CacheAdapters
 					OnError (this, ex);
 			}
 			return isInited;
+		}
+
+
+		private void InitMemoryCache()
+		{
+			if (memoryCache != null)
+				memoryCache.Dispose();
+			memoryCache = new MemoryCache("RedisCacheAdapter.InternalCache");
+
+			if (recentKeys != null)
+				recentKeys.Dispose();
+			recentKeys = new MemoryCache("RedisCacheAdapter.RecentKeys");
 		}
 
 
@@ -283,6 +288,21 @@ namespace AttributeCaching.CacheAdapters
 			{
 				string key = GetKey(keyBytes);
 				memoryCache.Remove(key);
+			}
+			catch (Exception ex)
+			{
+				if (OnError != null)
+					OnError(this, ex);
+			}
+		}
+
+
+		private void OnRemoteFlushed(string ev, byte[] data)
+		{
+			try
+			{
+				lock (sync)
+					InitMemoryCache();
 			}
 			catch (Exception ex)
 			{
