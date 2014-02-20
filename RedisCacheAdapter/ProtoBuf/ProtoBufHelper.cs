@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 using ProtoBuf;
 using ProtoBuf.Meta;
 
-namespace AttributeCaching.CacheAdapters
+namespace AttributeCaching.CacheAdapters.ProtoBuf
 {
 	/// <summary>
 	/// Helps to serialize and deserialize custom classes.
@@ -39,6 +40,12 @@ namespace AttributeCaching.CacheAdapters
 			knownTypes.Add(typeof(Uri));
 			knownTypes.Add(typeof(byte[]));
 			knownTypes.Add(typeof(Type));
+
+			// ours
+			runtimeTypeModel.Add(typeof(XmlDocument), false).SetSurrogate(typeof(XmlDocumentSurrogate));
+			runtimeTypeModel.Add(typeof(DateTimeOffset), false).SetSurrogate(typeof(DateTimeOffsetSurrogate));
+			knownTypes.Add(typeof(XmlDocument));
+			knownTypes.Add(typeof(DateTimeOffset));
 		}
 
 

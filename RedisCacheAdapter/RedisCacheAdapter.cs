@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
+using AttributeCaching.CacheAdapters.ProtoBuf;
 using BookSleeve;
 
 namespace AttributeCaching.CacheAdapters
