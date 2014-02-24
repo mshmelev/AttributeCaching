@@ -34,7 +34,7 @@ namespace AttributeCaching.CacheAdapters
 
 		private readonly static object sync= new object();
 
-		public event EventHandler<Exception> OnError;		// TODO: handle
+		public event EventHandler<Exception> OnError;
 
 
 
@@ -61,6 +61,8 @@ namespace AttributeCaching.CacheAdapters
 			{
 				lock (sync)
 				{
+					InitMemoryCache();
+
 					++curServer;
 					if (curServer >= servers.Length)
 						curServer = 0;
