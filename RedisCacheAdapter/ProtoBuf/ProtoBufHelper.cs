@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml;
 using ProtoBuf;
@@ -115,7 +116,7 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 				type = Nullable.GetUnderlyingType(type);
 
 			var metaType = runtimeTypeModel.Add(type, false);
-			var fields = type.GetMembers(BindingFlags.Instance | BindingFlags.Public);
+			var fields = type.GetMembers(BindingFlags.Instance | BindingFlags.Public).OrderBy (f => f.Name);
 			foreach (var fieldInfo in fields)
 			{
 				if (fieldInfo.MemberType == MemberTypes.Field || fieldInfo.MemberType == MemberTypes.Property)
