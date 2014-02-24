@@ -85,9 +85,7 @@ namespace AttributeCaching.CacheAdapters
 			catch (Exception ex)
 			{
 				isInited = false;
-
-				if (OnError != null)
-					OnError (this, ex);
+				RaiseError (ex);
 			}
 			return isInited;
 		}
@@ -136,9 +134,7 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
-
+				RaiseError(ex);
 				return null;
 			}
 		}
@@ -157,21 +153,27 @@ namespace AttributeCaching.CacheAdapters
 				{
 					try
 					{
-						redis.Strings.Set(CacheDb, key, ProtoBufHelper.Serialize(value), (long)lifeSpan.TotalSeconds);
 						recentKeys.Set(key, true, DateTimeOffset.Now.Add(RecentHistoryLifetime));
+						redis.Strings.Set(CacheDb, key, ProtoBufHelper.Serialize(value), (long)lifeSpan.TotalSeconds).Wait();
 						AddDependencyTags(key, dependencyTags);
 					}
 					catch (Exception ex)
 					{
-						if (OnError != null)
-							OnError(this, ex);
+						try
+						{
+							memoryCache.Remove (key);		// if not saved in remote cache, not needed in the local one
+						}
+						catch (Exception ex2)
+						{
+							RaiseError(ex2);
+						}
+						RaiseError(ex);
 					}
 				});
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
@@ -200,8 +202,7 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
@@ -219,8 +220,7 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
@@ -238,16 +238,18 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
 
 		private void AddDependencyTags(string key, IEnumerable<string> dependencyTags)
 		{
+			var tasks = new List<Task>();
 			foreach (var tag in dependencyTags)
-				redis.Sets.Add (TagsDb, tag, key);
+				tasks.Add (redis.Sets.Add (TagsDb, tag, key));
+
+			Task.WaitAll (tasks.ToArray());
 		}
 
 
@@ -278,8 +280,7 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
@@ -293,8 +294,7 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
@@ -308,16 +308,14 @@ namespace AttributeCaching.CacheAdapters
 			}
 			catch (Exception ex)
 			{
-				if (OnError != null)
-					OnError(this, ex);
+				RaiseError(ex);
 			}
 		}
 
 
 		private void OnRedisError(object sender, ErrorEventArgs errorEventArgs)
 		{
-			if (OnError != null)
-				OnError(this, errorEventArgs.Exception);
+			RaiseError (errorEventArgs.Exception);
 		}
 
 
@@ -332,6 +330,14 @@ namespace AttributeCaching.CacheAdapters
 		{
 			return Encoding.UTF8.GetString(keyBytes);
 		}
+
+
+		private void RaiseError(Exception ex)
+		{
+			if (OnError != null)
+				OnError(this, ex);
+		}
+
 
 
 	}
