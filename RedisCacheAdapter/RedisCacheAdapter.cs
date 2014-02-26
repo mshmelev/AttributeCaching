@@ -204,6 +204,9 @@ namespace AttributeCaching.CacheAdapters
 
 		private void Remove (string[] keys)
 		{
+			if (keys== null || keys.Length== 0)
+				return;
+
 			try
 			{
 				redis.Keys.Remove(CacheDb, keys);
