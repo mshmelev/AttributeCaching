@@ -17,7 +17,7 @@ namespace AttributeCaching.CacheAdapters
 	/// Doesn't support named caches (cacheName parameter is ignored everywhere).
 	/// Enabling of notifications on server is required with: CONFIG SET notify-keyspace-events Eg
 	/// </summary>
-	public class RedisCacheAdapter : CacheAdapter
+	public class RedisCacheAdapter : CacheAdapter, IDisposable
 	{
 		private const int CacheDb = 0;
 		private const int TagsDb = 1;
@@ -53,6 +53,20 @@ namespace AttributeCaching.CacheAdapters
 
 			OpenDb();
 		}
+
+
+		public void Dispose()
+		{
+			if (subChannel!= null)
+				subChannel.Dispose();
+			if (redis!= null)
+				redis.Dispose();
+			if (memoryCache!= null)
+				memoryCache.Dispose();
+			if (recentKeys!= null)
+				recentKeys.Dispose();
+		}
+
 
 
 		private bool OpenDb()
@@ -337,7 +351,6 @@ namespace AttributeCaching.CacheAdapters
 			if (OnError != null)
 				OnError(this, ex);
 		}
-
 
 
 	}
