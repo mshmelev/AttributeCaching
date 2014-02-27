@@ -4,16 +4,8 @@ using ProtoBuf.Meta;
 
 namespace AttributeCaching.CacheAdapters.ProtoBuf
 {
-    public class InitializeDateTimeOffsetSurrogate
-    {
-        static InitializeDateTimeOffsetSurrogate()
-        {
-            RuntimeTypeModel.Default.Add(typeof (DateTimeOffset), false).SetSurrogate(typeof (DateTimeOffsetSurrogate));
-        }
-    }
-
     [ProtoContract]
-    public class DateTimeOffsetSurrogate
+    internal class DateTimeOffsetSurrogate
     {
         [ProtoMember(1)]
         public long DateTimeTicks { get; set; }

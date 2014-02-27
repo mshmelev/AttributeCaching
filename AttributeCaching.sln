@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{768B54
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCacheAdapter", "RedisCacheAdapter\RedisCacheAdapter.csproj", "{C2268C0C-E0C8-47FE-B411-CB10170492DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCacheAdapter.Tests", "RedisCacheAdapter.Tests\RedisCacheAdapter.Tests.csproj", "{1A572B66-827B-41F4-9371-ED05B9EECFCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{C2268C0C-E0C8-47FE-B411-CB10170492DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2268C0C-E0C8-47FE-B411-CB10170492DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2268C0C-E0C8-47FE-B411-CB10170492DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A572B66-827B-41F4-9371-ED05B9EECFCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A572B66-827B-41F4-9371-ED05B9EECFCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A572B66-827B-41F4-9371-ED05B9EECFCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A572B66-827B-41F4-9371-ED05B9EECFCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

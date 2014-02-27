@@ -26,6 +26,7 @@ namespace AttributeCaching.CacheAdapters
 		private readonly RedisServer[] servers;
 		private int curServer = -1;
 		private bool isInited;
+		private bool isDisposed;
 
 		private RedisConnection redis;
 		private RedisSubscriberConnection subChannel;
@@ -34,7 +35,16 @@ namespace AttributeCaching.CacheAdapters
 
 		private readonly static object sync= new object();
 
+		/// <summary>
+		/// Raised on any error occured: in background and in foreground
+		/// </summary>
 		public event EventHandler<Exception> OnError;
+
+		/// <summary>
+		/// Event name that should be sent when Redis DB is flushed (FLUSH command doesn't send any notifications by itself)
+		/// </summary>
+		public const string FlushedEventName = "__flushed";
+
 
 
 
@@ -57,6 +67,8 @@ namespace AttributeCaching.CacheAdapters
 
 		public void Dispose()
 		{
+			isDisposed = true;
+			isInited = false;
 			if (subChannel!= null)
 				subChannel.Dispose();
 			if (redis!= null)
@@ -75,6 +87,9 @@ namespace AttributeCaching.CacheAdapters
 			{
 				lock (sync)
 				{
+					if (isDisposed)
+						return false;
+
 					InitMemoryCache();
 
 					++curServer;
@@ -90,7 +105,7 @@ namespace AttributeCaching.CacheAdapters
 					subChannel.Error += OnRedisError;
 					subChannel.Subscribe(String.Format("__keyevent@{0}__:del", CacheDb), OnRemoteKeyDeleted);
 					subChannel.Subscribe(String.Format("__keyevent@{0}__:expire", CacheDb), OnRemoteKeyExpirationSet);		// expire event is enough, as far as SETEX redis command is only used to set values
-					subChannel.Subscribe("__flushed", OnRemoteFlushed);					// not a system message, should be published manually
+					subChannel.Subscribe(FlushedEventName, OnRemoteFlushed);					// not a system message, should be published manually
 
 					isInited = true;
 					return true;
@@ -114,6 +129,26 @@ namespace AttributeCaching.CacheAdapters
 			if (recentKeys != null)
 				recentKeys.Dispose();
 			recentKeys = new MemoryCache("RedisCacheAdapter.RecentKeys");
+		}
+
+
+		/// <summary>
+		/// Returns current local in-memory cache
+		/// </summary>
+		internal MemoryCache MemoryCache
+		{
+			get
+			{
+				return memoryCache;
+			}
+		}
+
+		internal RedisConnection RedisConnection
+		{
+			get
+			{
+				return redis;
+			}
 		}
 
 
@@ -141,7 +176,7 @@ namespace AttributeCaching.CacheAdapters
 
 					obj = ProtoBufHelper.Deserialize(getTask.Result);
 					if (obj != null)
-						memoryCache.Set(key, obj, DateTimeOffset.Now.AddSeconds(ttlTask.Result));
+						memoryCache.Set(key, obj, (ttlTask.Result == -1) ? DateTimeOffset.Now.AddYears(100) : DateTimeOffset.Now.AddSeconds(ttlTask.Result));
 				}
 
 				return obj;
@@ -156,38 +191,47 @@ namespace AttributeCaching.CacheAdapters
 
 		public override void Set (string key, object value, TimeSpan lifeSpan, string cacheName, IEnumerable<string> dependencyTags)
 		{
+			SetAsync(key, value, lifeSpan, dependencyTags);
+		}
+
+
+		internal Task<bool> SetAsync (string key, object value, TimeSpan lifeSpan, IEnumerable<string> dependencyTags)
+		{
 			if (!ValidateDb())
-				return;
+				return Task.FromResult (false);
 
 			try
 			{
-				memoryCache.Set(key, value, DateTimeOffset.Now.Add(lifeSpan));
+				memoryCache.Set (key, value, DateTimeOffset.Now.Add (lifeSpan));
 
-				Task.Run(() =>
+				return Task.Run (() =>
 				{
 					try
 					{
-						recentKeys.Set(key, true, DateTimeOffset.Now.Add(RecentHistoryLifetime));
-						redis.Strings.Set(CacheDb, key, ProtoBufHelper.Serialize(value), (long)lifeSpan.TotalSeconds).Wait();
-						AddDependencyTags(key, dependencyTags);
+						recentKeys.Set (key, true, DateTimeOffset.Now.Add (RecentHistoryLifetime));
+						redis.Strings.Set (CacheDb, key, ProtoBufHelper.Serialize (value), (long) lifeSpan.TotalSeconds).Wait();
+						AddDependencyTags (key, dependencyTags);
+						return true;
 					}
 					catch (Exception ex)
 					{
 						try
 						{
-							memoryCache.Remove (key);		// if not saved in remote cache, not needed in the local one
+							memoryCache.Remove (key); // if not saved in remote cache, not needed in the local one
 						}
 						catch (Exception ex2)
 						{
-							RaiseError(ex2);
+							RaiseError (ex2);
 						}
-						RaiseError(ex);
+						RaiseError (ex);
 					}
+					return false;
 				});
 			}
 			catch (Exception ex)
 			{
-				RaiseError(ex);
+				RaiseError (ex);
+				return Task.FromResult(false);
 			}
 		}
 
@@ -229,6 +273,9 @@ namespace AttributeCaching.CacheAdapters
 			if (!ValidateDb())
 				return;
 
+			if (dependencyTags.Length== 0)
+				return;
+
 			try
 			{
 				redis.Sets.IntersectString(TagsDb, dependencyTags)
@@ -247,6 +294,9 @@ namespace AttributeCaching.CacheAdapters
 			if (!ValidateDb())
 				return;
 
+			if (dependencyTags.Length == 0)
+				return;
+
 			try
 			{
 				redis.Sets.UnionString(TagsDb, dependencyTags)
@@ -262,6 +312,9 @@ namespace AttributeCaching.CacheAdapters
 
 		private void AddDependencyTags(string key, IEnumerable<string> dependencyTags)
 		{
+			if (dependencyTags == null)
+				return;
+
 			var tasks = new List<Task>();
 			foreach (var tag in dependencyTags)
 				tasks.Add (redis.Sets.Add (TagsDb, tag, key));
@@ -289,7 +342,7 @@ namespace AttributeCaching.CacheAdapters
 
 						var obj = ProtoBufHelper.Deserialize(getTask.Result);
 						if (obj != null)
-							memoryCache.Set(key, obj, DateTimeOffset.Now.AddSeconds(ttlTask.Result));
+							memoryCache.Set(key, obj, (ttlTask.Result == -1) ? DateTimeOffset.Now.AddYears(100) : DateTimeOffset.Now.AddSeconds(ttlTask.Result));
 						else
 							memoryCache.Remove(key);
 					}
@@ -339,7 +392,8 @@ namespace AttributeCaching.CacheAdapters
 		private void OnRedisClosed(object sender, EventArgs eventArgs)
 		{
 			isInited = false;
-			OpenDb();
+			if (!isDisposed)
+				OpenDb();
 		}
 
 
