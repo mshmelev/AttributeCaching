@@ -27,7 +27,7 @@ namespace RedisCacheAdapter.Tests
 			conBuilder.ConnectionString = ConfigurationManager.ConnectionStrings["RedisDB"].ConnectionString;
 			string[] server = ((string) conBuilder["Server"]).Split (':');
 			redisDb = new RedisConnection(server[0], Convert.ToInt32 (server[1]));
-			redisDb.Open();
+			redisDb.Open().Wait();
 		}
 
 		[ClassCleanup]
@@ -47,14 +47,6 @@ namespace RedisCacheAdapter.Tests
 		[TestCleanup]
 		public void Cleanup()
 		{
-			var keys = redisDb.Keys.Find(0, "_~*").Result;
-			if (keys.Length > 0)
-				redisDb.Keys.Remove(0, keys).Wait();
-			keys = redisDb.Keys.Find(1, "_~*").Result;
-			if (keys.Length > 0)
-				redisDb.Keys.Remove(1, keys).Wait();
-
-			cache.RedisConnection.Close(false);
 			cache.Dispose();
 			if (backgroundException != null)
 			{
@@ -62,6 +54,13 @@ namespace RedisCacheAdapter.Tests
 				backgroundException = null;
 				throw ex;
 			}
+
+			var keys = redisDb.Keys.Find(0, "_~*").Result;
+			if (keys.Length > 0)
+				redisDb.Keys.Remove(0, keys).Wait();
+			keys = redisDb.Keys.Find(1, "_~*").Result;
+			if (keys.Length > 0)
+				redisDb.Keys.Remove(1, keys).Wait();
 		}
 
 

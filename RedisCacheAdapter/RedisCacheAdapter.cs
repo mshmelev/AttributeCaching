@@ -103,10 +103,11 @@ namespace AttributeCaching.CacheAdapters
 
 					subChannel = redis.GetOpenSubscriberChannel();
 					subChannel.Error += OnRedisError;
-					subChannel.Subscribe(String.Format("__keyevent@{0}__:del", CacheDb), OnRemoteKeyDeleted);
-					subChannel.Subscribe(String.Format("__keyevent@{0}__:expire", CacheDb), OnRemoteKeyExpirationSet);		// expire event is enough, as far as SETEX redis command is only used to set values
-					subChannel.Subscribe(FlushedEventName, OnRemoteFlushed);					// not a system message, should be published manually
-
+					Task.WaitAll (
+						subChannel.Subscribe (String.Format ("__keyevent@{0}__:del", CacheDb), OnRemoteKeyDeleted),
+						subChannel.Subscribe (String.Format ("__keyevent@{0}__:expire", CacheDb), OnRemoteKeyExpirationSet), // expire event is enough, as far as SETEX redis command is only used to set values
+						subChannel.Subscribe (FlushedEventName, OnRemoteFlushed)  // not a system message, should be published manually
+					);
 					isInited = true;
 					return true;
 				}
@@ -331,11 +332,7 @@ namespace AttributeCaching.CacheAdapters
 
 				if (memoryCache.Contains(key))
 				{
-					if (recentKeys.Contains(key))						// ignore if just added by this process
-					{
-						recentKeys.Remove(key);							// next notification will be real for sure
-					}
-					else
+					if (recentKeys.Remove(key)== null)						// ignore if key is just added by this process
 					{
 						var getTask = redis.Strings.Get(CacheDb, key);
 						var ttlTask = redis.Keys.TimeToLive(CacheDb, key);
