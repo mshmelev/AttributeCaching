@@ -119,7 +119,8 @@ namespace RedisCacheAdapter.Tests
 				f1 = 77,
 				f2 = null,
 				f3= 92,
-				subs = new[] { new ComplexClass {P1 = "sub_p1"} }
+				subs = new[] { new ComplexClass {P1 = "sub_p1"} },
+				fb = "bse"
 			};
 
 			cache.SetAsync ("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
@@ -135,6 +136,7 @@ namespace RedisCacheAdapter.Tests
 			Assert.AreEqual (c.f3, c2.f3);
 			Assert.AreEqual(c.subs.Length, c2.subs.Length);
 			Assert.AreEqual(c.subs[0].P1, c2.subs[0].P1);
+			Assert.AreEqual(c.fb, c2.fb);
 		}
 
 		

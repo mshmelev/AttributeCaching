@@ -1,6 +1,6 @@
 ﻿namespace RedisCacheAdapter.Tests
 {
-	public class ComplexClass
+	public class ComplexClass : BaseClass
 	{
 		public int f1;
 		public int[] arr;
@@ -9,5 +9,10 @@
 		public ComplexClass[] subs;
 		public int? f2;
 		public int? f3;
+	}
+
+	public abstract class BaseClass
+	{
+		public string fb;
 	}
 }
