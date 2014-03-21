@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting;
+using System.Runtime.Serialization;
 using System.Xml;
+using System.Xml.Serialization;
 using ProtoBuf;
 using ProtoBuf.Meta;
 
@@ -116,6 +119,8 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 				type = Nullable.GetUnderlyingType(type);
 
 			var metaType = runtimeTypeModel.Add(type, false);
+			knownTypes.Add (type);
+
 			var fields = type.GetMembers(BindingFlags.Instance | BindingFlags.Public).OrderBy (f => f.Name);
 			int fieldNumber = 0;
 			foreach (var fieldInfo in fields)
@@ -155,6 +160,14 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 			// proto-buf natively supported
 			if (runtimeTypeModel.IsDefined(type))
 			{
+				if (type.CustomAttributes.Any (attr => attr.AttributeType == typeof (DataContractAttribute) || attr.AttributeType == typeof (XmlTypeAttribute))
+					&& type.GetCustomAttribute<ProtoContractAttribute>()== null)
+				{
+					// Type with DataContract/XmlType attribute but no ProtoContract are in a risk group: Protobuffer thinks that it can serialize them,
+					// but it can only in the case they have DataMember.Order value.
+					// To avoid risk all such types are forced to be serialized with all public fields/props
+					return false;
+				}
 				knownTypes.Add(type);
 				return true;
 			}

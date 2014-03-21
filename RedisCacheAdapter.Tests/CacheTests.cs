@@ -312,5 +312,54 @@ namespace RedisCacheAdapter.Tests
 			Assert.AreEqual("bbb_", c2.PrivateSetProp);
 		}
 
+
+		[TestMethod]
+		public void DataContractWithoutProtoContractSerialization()
+		{
+			var c = new DataContractClass();
+			c.P1 = "ppp1";
+			c.f1 = 42;
+
+			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			var c2 = (DataContractClass)cache.Get("_~k1", null);
+
+			Assert.AreEqual ("ppp1", c2.P1);
+			Assert.AreEqual (42, c2.f1);
+		}
+
+
+		[TestMethod]
+		public void XmlSerializableWithoutProtoContractSerialization()
+		{
+			var c = new SerializableClass();
+			c.P1 = "ppp1";
+			c.f1 = 42;
+
+			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			var c2 = (SerializableClass)cache.Get("_~k1", null);
+
+			Assert.AreEqual ("ppp1", c2.P1);
+			Assert.AreEqual (42, c2.f1);
+		}
+
+
+		[TestMethod]
+		public void ProtoContractSerialization()
+		{
+			var c = new ProtoContractClass();
+			c.P1 = "ppp1";
+			c.f1 = 42;
+
+			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			var c2 = (ProtoContractClass)cache.Get("_~k1", null);
+
+			Assert.IsNull (c2.P1);
+			Assert.AreEqual (42, c2.f1);
+		}
+
+
 	}
 }
