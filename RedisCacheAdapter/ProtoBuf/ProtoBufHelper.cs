@@ -122,7 +122,21 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 			{
 				if (fieldInfo.MemberType == MemberTypes.Field || fieldInfo.MemberType == MemberTypes.Property)
 				{
-					Type memberType = (fieldInfo is PropertyInfo) ? ((PropertyInfo)fieldInfo).PropertyType : ((FieldInfo)fieldInfo).FieldType;
+					Type memberType;
+					var propertyInfo = fieldInfo as PropertyInfo;
+					if (propertyInfo != null)
+					{
+						memberType = propertyInfo.PropertyType;
+						if (!propertyInfo.CanWrite)
+							continue;
+						if (!propertyInfo.SetMethod.IsPublic)
+							continue;
+					}
+					else
+					{
+						memberType = ((FieldInfo)fieldInfo).FieldType;
+					}
+
 					if (!IsKnownType(memberType))
 						AddTypeAsSerializable(memberType);
 

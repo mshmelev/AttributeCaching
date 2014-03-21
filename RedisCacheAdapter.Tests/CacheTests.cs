@@ -292,5 +292,25 @@ namespace RedisCacheAdapter.Tests
 			CollectionAssert.AreEqual (new[] {1, 3, 5}, c2.Items);
 		}
 
+
+		[TestMethod]
+		public void ReadonlyProperty()
+		{
+			var c = new ClassWithGetProp();
+			c.PublicProp = "aaa";
+
+			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+
+			var c2 = (ClassWithGetProp)cache.Get("_~k1", null);
+			Assert.AreEqual ("aaa", c2.PublicProp);
+			Assert.AreEqual ("aaa_", c2.ReadonlyProp);
+			Assert.AreEqual ("aaa_", c2.PrivateSetProp);
+
+			c2.PublicProp = "bbb";
+			Assert.AreEqual("bbb_", c2.ReadonlyProp);
+			Assert.AreEqual("bbb_", c2.PrivateSetProp);
+		}
+
 	}
 }
