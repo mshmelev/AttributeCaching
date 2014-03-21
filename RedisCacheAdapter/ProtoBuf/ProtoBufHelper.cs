@@ -117,6 +117,7 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 
 			var metaType = runtimeTypeModel.Add(type, false);
 			var fields = type.GetMembers(BindingFlags.Instance | BindingFlags.Public).OrderBy (f => f.Name);
+			int fieldNumber = 0;
 			foreach (var fieldInfo in fields)
 			{
 				if (fieldInfo.MemberType == MemberTypes.Field || fieldInfo.MemberType == MemberTypes.Property)
@@ -125,7 +126,8 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 					if (!IsKnownType(memberType))
 						AddTypeAsSerializable(memberType);
 
-					metaType.Add(fieldInfo.Name);
+					var valueMember = metaType.AddField (++fieldNumber, fieldInfo.Name, null, null);
+					valueMember.OverwriteList = true;
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
 using System.Runtime.Caching;
@@ -277,5 +278,20 @@ namespace RedisCacheAdapter.Tests
 			cache.SetAsync("_~k1", "v1", TimeSpan.FromSeconds(10), null).Wait();
 			Assert.AreEqual("v1", cache.Get("_~k1", null));
 		}
+
+
+		[TestMethod]
+		public void ListIsOverwritten()
+		{
+			var c = new ClassWithList();
+			c.Items = new List<int> {1, 3, 5};
+
+			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+
+			var c2 = (ClassWithList)cache.Get("_~k1", null);
+			CollectionAssert.AreEqual (new[] {1, 3, 5}, c2.Items);
+		}
+
 	}
 }
