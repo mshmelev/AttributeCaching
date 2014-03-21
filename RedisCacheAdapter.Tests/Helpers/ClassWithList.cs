@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RedisCacheAdapter.Tests
+namespace RedisCacheAdapter.Tests.Helpers
 {
 	public class ClassWithList
 	{

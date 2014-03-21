@@ -1,4 +1,4 @@
-﻿namespace RedisCacheAdapter.Tests
+﻿namespace RedisCacheAdapter.Tests.Helpers
 {
 	public class ComplexClass : BaseClass
 	{

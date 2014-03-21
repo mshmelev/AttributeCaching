@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
-using System.Runtime.Caching;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using BookSleeve;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RedisCacheAdapter.Tests.Helpers;
 
 namespace RedisCacheAdapter.Tests
 {

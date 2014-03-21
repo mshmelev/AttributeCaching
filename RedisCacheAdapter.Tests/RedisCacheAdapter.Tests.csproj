@@ -61,8 +61,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CacheTests.cs" />
-    <Compile Include="ClassWithList.cs" />
-    <Compile Include="ComplexClass.cs" />
+    <Compile Include="Helpers\ClassWithList.cs" />
+    <Compile Include="Helpers\ComplexClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
