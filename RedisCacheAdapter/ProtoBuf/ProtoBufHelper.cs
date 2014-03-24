@@ -101,9 +101,12 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 
 		private static void PrepareType(Type type)
 		{
-			if (IsKnownType (type))
-				return;
-			AddTypeAsSerializable (type);
+			lock (runtimeTypeModel)
+			{
+				if (IsKnownType (type))
+					return;
+				AddTypeAsSerializable (type);
+			}
 		}
 
 

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
-using System.Linq;
 using System.Threading;
 using System.Xml;
-using System.Xml.Serialization;
 using BookSleeve;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RedisCacheAdapter.Tests.Helpers;
