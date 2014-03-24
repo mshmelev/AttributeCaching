@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
+using System.Linq;
 using System.Threading;
 using System.Xml;
+using System.Xml.Serialization;
 using BookSleeve;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RedisCacheAdapter.Tests.Helpers;
@@ -359,7 +361,27 @@ namespace RedisCacheAdapter.Tests
 			Assert.IsNull (c2.P1);
 			Assert.AreEqual (42, c2.f1);
 		}
+		
+		
+		
+		[TestMethod]
+		public void TestCollectionSerialization()
+		{
+			int[] arr = {1, 2, 3, 4, 5};
+			cache.SetAsync("_~k1", arr, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			int[] arr2 = (int[])cache.Get("_~k1", null);
+			CollectionAssert.AreEqual (arr, arr2);
+
+			List<int> lst= new List<int> {1, 2, 3, 4, 5};
+			cache.SetAsync("_~k1", lst, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			List<int> lst2= (List<int>)cache.Get("_~k1", null);
+			CollectionAssert.AreEqual (lst, lst2);
+		}
 
 
 	}
+
+
 }

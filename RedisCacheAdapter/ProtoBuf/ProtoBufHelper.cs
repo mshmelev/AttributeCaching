@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
@@ -194,10 +194,10 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 
 		private static Type GetEnumerableElementType(Type type)
 		{
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-				type = type.GetGenericArguments()[0];
-			else if (type.IsArray)
+			if (type.IsArray)
 				type = type.GetElementType();
+			else if (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
+				type = type.GetGenericArguments()[0];
 
 			return type;
 		}
