@@ -33,6 +33,7 @@ namespace RedisCacheAdapter.Tests
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
+			CleanRedis();
 		}
 
 
@@ -55,12 +56,18 @@ namespace RedisCacheAdapter.Tests
 				throw ex;
 			}
 
-			var keys = redisDb.Keys.Find(0, "_~*").Result;
+			CleanRedis();
+		}
+
+
+		private static void CleanRedis()
+		{
+			var keys = redisDb.Keys.Find (0, "_~*").Result;
 			if (keys.Length > 0)
-				redisDb.Keys.Remove(0, keys).Wait();
-			keys = redisDb.Keys.Find(1, "_~*").Result;
+				redisDb.Keys.Remove (0, keys).Wait();
+			keys = redisDb.Keys.Find (1, "_~*").Result;
 			if (keys.Length > 0)
-				redisDb.Keys.Remove(1, keys).Wait();
+				redisDb.Keys.Remove (1, keys).Wait();
 		}
 
 
@@ -371,11 +378,31 @@ namespace RedisCacheAdapter.Tests
 			int[] arr2 = (int[])cache.Get("_~k1", null);
 			CollectionAssert.AreEqual (arr, arr2);
 
-			List<int> lst= new List<int> {1, 2, 3, 4, 5};
+			var lst= new List<int> {1, 2, 3, 4, 5, 6};
 			cache.SetAsync("_~k1", lst, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			List<int> lst2= (List<int>)cache.Get("_~k1", null);
+			var lst2= (List<int>)cache.Get("_~k1", null);
 			CollectionAssert.AreEqual (lst, lst2);
+
+			var set = new HashSet<string> { "1", "2", "3", "4", "5", "6", "7" };
+			cache.SetAsync("_~k1", set, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			var set2 = (HashSet<string>)cache.Get("_~k1", null);
+			Assert.IsTrue (set.IsSubsetOf (set2) && set2.IsSubsetOf (set));
+		}
+
+		// TODO: Test empty & null collections
+
+
+		[TestMethod]
+		[Ignore]
+		public void TestDictionarySerialization()
+		{
+			var dic = new Dictionary<string, DicClass> { { "a", new DicClass { Prop = "p1" } }, { "b", new DicClass { Prop = "p1" } } };
+			cache.SetAsync("_~k1", dic, TimeSpan.FromMinutes(1), null).Wait();
+			cache.MemoryCache.Remove("_~k1");
+			var dic2 = (Dictionary<string, DicClass>)cache.Get("_~k1", null);
+			CollectionAssert.AreEqual (dic, dic2);
 		}
 
 

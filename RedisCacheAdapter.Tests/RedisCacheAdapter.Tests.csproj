@@ -72,6 +72,7 @@
     <Compile Include="Helpers\DataContractClass.cs" />
     <Compile Include="Helpers\ProtoContractClass.cs" />
     <Compile Include="Helpers\SerializableClass.cs" />
+    <Compile Include="Helpers\DicClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
