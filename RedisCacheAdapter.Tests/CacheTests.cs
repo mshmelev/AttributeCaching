@@ -395,7 +395,7 @@ namespace RedisCacheAdapter.Tests
 
 
 		[TestMethod]
-		[Ignore]
+		[Ignore]			// TODO: implement test
 		public void TestDictionarySerialization()
 		{
 			var dic = new Dictionary<string, DicClass> { { "a", new DicClass { Prop = "p1" } }, { "b", new DicClass { Prop = "p1" } } };

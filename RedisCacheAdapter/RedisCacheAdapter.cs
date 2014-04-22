@@ -25,6 +25,7 @@ namespace AttributeCaching.CacheAdapters
 
 		private readonly RedisServer[] servers;
 		private int curServer = -1;
+		private const int ConnectRetryAttempts = 3;
 		private bool isInited;
 		private bool isDisposed;
 
@@ -93,16 +94,17 @@ namespace AttributeCaching.CacheAdapters
 					InitMemoryCache();
 
 					++curServer;
-					if (curServer >= servers.Length)
+					if ((curServer / ConnectRetryAttempts) >= servers.Length)
 						curServer = 0;
 
-					redis = new RedisConnection(servers[curServer].Host, servers[curServer].Port);
+					redis = new RedisConnection(servers[curServer / ConnectRetryAttempts].Host, servers[curServer / ConnectRetryAttempts].Port);
 					redis.Error += OnRedisError;
 					redis.Closed += OnRedisClosed;
 					redis.Open().Wait();
 
 					subChannel = redis.GetOpenSubscriberChannel();
 					subChannel.Error += OnRedisError;
+					subChannel.Closed += OnRedisClosed;
 					Task.WaitAll (
 						subChannel.Subscribe (String.Format ("__keyevent@{0}__:del", CacheDb), OnRemoteKeyDeleted),
 						subChannel.Subscribe (String.Format ("__keyevent@{0}__:expire", CacheDb), OnRemoteKeyExpirationSet), // expire event is enough, as far as SETEX redis command is only used to set values
@@ -389,8 +391,6 @@ namespace AttributeCaching.CacheAdapters
 		private void OnRedisClosed(object sender, EventArgs eventArgs)
 		{
 			isInited = false;
-			if (!isDisposed)
-				OpenDb();
 		}
 
 
