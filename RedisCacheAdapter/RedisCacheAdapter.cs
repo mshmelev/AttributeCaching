@@ -70,16 +70,12 @@ namespace AttributeCaching.CacheAdapters
 		{
 			isDisposed = true;
 			isInited = false;
-			if (subChannel!= null)
-				subChannel.Dispose();
-			if (redis!= null)
-				redis.Dispose();
+			CloseRedisChannels();
 			if (memoryCache!= null)
 				memoryCache.Dispose();
 			if (recentKeys!= null)
 				recentKeys.Dispose();
 		}
-
 
 
 		private bool OpenDb()
@@ -90,11 +86,8 @@ namespace AttributeCaching.CacheAdapters
 				{
 					if (isDisposed)
 						return false;
-						
-					if (redis!= null)
-						redis.Dispose();
-					if (subChannel!= null)
-						subChannel.Dispose();
+
+					CloseRedisChannels();
 					InitMemoryCache();
 
 					++curServer;
@@ -124,6 +117,23 @@ namespace AttributeCaching.CacheAdapters
 				RaiseError (ex);
 			}
 			return isInited;
+		}
+
+
+		private void CloseRedisChannels()
+		{
+			if (subChannel != null)
+			{
+				subChannel.Error -= OnRedisError;
+				subChannel.Closed -= OnRedisClosed;
+				subChannel.Dispose();
+			}
+			if (redis != null)
+			{
+				redis.Error -= OnRedisError;
+				redis.Closed -= OnRedisClosed;
+				redis.Dispose();
+			}
 		}
 
 
