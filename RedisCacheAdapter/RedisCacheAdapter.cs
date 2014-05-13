@@ -90,7 +90,11 @@ namespace AttributeCaching.CacheAdapters
 				{
 					if (isDisposed)
 						return false;
-
+						
+					if (redis!= null)
+						redis.Dispose();
+					if (subChannel!= null)
+						subChannel.Dispose();
 					InitMemoryCache();
 
 					++curServer;
