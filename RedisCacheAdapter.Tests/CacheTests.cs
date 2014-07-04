@@ -197,7 +197,7 @@ namespace RedisCacheAdapter.Tests
 
 			redisDb.Strings.Set(0, "_~k1", AttributeCaching.CacheAdapters.ProtoBuf.ProtoBufHelper.Serialize("v2"), 10).Wait();
 			Thread.Sleep (200);
-			Assert.AreEqual("v2", cache.Get("_~k1", null));
+			Assert.AreEqual("v2", cache.Get("_~k1", null), "Redis is not configured?");
 		}
 
 
@@ -209,7 +209,7 @@ namespace RedisCacheAdapter.Tests
 
 			redisDb.Keys.Remove (0, "_~k1").Wait();
 			Thread.Sleep (200);
-			Assert.IsNull(cache.Get("_~k1", null));
+			Assert.IsNull(cache.Get("_~k1", null), "Redis is not configured?");
 		}
 
 
