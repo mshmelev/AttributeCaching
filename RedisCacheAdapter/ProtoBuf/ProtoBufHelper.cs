@@ -117,6 +117,20 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 		/// <param name="type"></param>
 		private static void AddTypeAsSerializable(Type type)
 		{
+			// special case for dictionaries
+			var dicTypes = GetDictionaryElementTypes(type);
+			if (dicTypes.Length > 0)
+			{
+				foreach (var dicType in dicTypes)
+				{
+					if (!IsKnownType (dicType))
+						AddTypeAsSerializable (dicType);
+				}
+				knownTypes.Add (type);
+				return;
+			}
+
+
 			type = GetEnumerableElementType(type);
 			if (Nullable.GetUnderlyingType(type) != null)
 				type = Nullable.GetUnderlyingType(type);
@@ -175,6 +189,18 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 				return true;
 			}
 
+			// dictionaries
+			var dicTypes = GetDictionaryElementTypes (type);
+			if (dicTypes.Length> 0)
+			{
+				if (dicTypes.All (IsKnownType))
+				{
+					knownTypes.Add (type);
+					return true;
+				}
+				return false;
+			}
+
 			// enumerables
 			var elementType = GetEnumerableElementType(type);
 			if (elementType != type && IsKnownType(elementType))
@@ -203,6 +229,14 @@ namespace AttributeCaching.CacheAdapters.ProtoBuf
 				type = type.GetGenericArguments()[0];
 
 			return type;
+		}
+
+
+		private static Type[] GetDictionaryElementTypes (Type type)
+		{
+			if (type.IsGenericType && typeof (IDictionary).IsAssignableFrom (type))
+				return type.GetGenericArguments();
+			return new Type[0];
 		}
 
 	}

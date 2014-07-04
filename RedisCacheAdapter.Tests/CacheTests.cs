@@ -395,14 +395,14 @@ namespace RedisCacheAdapter.Tests
 
 
 		[TestMethod]
-		[Ignore]			// TODO: implement test
 		public void TestDictionarySerialization()
 		{
 			var dic = new Dictionary<string, DicClass> { { "a", new DicClass { Prop = "p1" } }, { "b", new DicClass { Prop = "p1" } } };
 			cache.SetAsync("_~k1", dic, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
 			var dic2 = (Dictionary<string, DicClass>)cache.Get("_~k1", null);
-			CollectionAssert.AreEqual (dic, dic2);
+			CollectionAssert.AreEqual(dic.Keys, dic2.Keys);
+			CollectionAssert.AreEqual(dic.Values, dic2.Values);
 		}
 
 
