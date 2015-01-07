@@ -42,6 +42,14 @@ namespace AttributeCaching.Tests.Helpers
 
 
 		[Cacheable]
+		public string CalcNull()
+		{
+			visitor.Visit();
+			return null;
+		}
+
+
+		[Cacheable]
 		public string CalcOverloaded(int id)
 		{
 			visitor.Visit();

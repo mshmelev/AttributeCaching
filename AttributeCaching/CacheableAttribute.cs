@@ -196,23 +196,23 @@ namespace AttributeCaching
 		/// <param name="args"></param>
 		public override void OnEntry(MethodExecutionArgs args)
 		{
-			// trye to get from cache first
+			// try to get from cache first
 			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
-			object value = CacheFactory.Cache.Get (key, CacheName);
+			var cacheItem = CacheFactory.Cache.Get (key, CacheName);
 
-			if (value == null && syncMethodCall)
+			if (cacheItem == null && syncMethodCall)
 			{
 				string lockKey = String.Intern (key);
 				Monitor.Enter (lockKey);
 
-				value = CacheFactory.Cache.Get(key, CacheName);			// value could have been already put to the cache by other thread at this point
-				if (value!= null)
+				cacheItem = CacheFactory.Cache.Get(key, CacheName);			// value could have been already put to the cache by other thread at this point
+				if (cacheItem != null)
 					Monitor.Exit (lockKey);
 			}
 
-			if (value != null)
+			if (cacheItem != null)
 			{
-				args.ReturnValue = value;
+				args.ReturnValue = cacheItem.Value;
 				args.FlowBehavior = FlowBehavior.Return;
 				return;
 			}
@@ -231,7 +231,7 @@ namespace AttributeCaching
 		public override void OnSuccess(MethodExecutionArgs args)
 		{
 			var cacheContext = (CacheContext) args.MethodExecutionTag;
-			if (args.ReturnValue != null && !cacheContext.IsCachingDisabled())
+			if (!isPropertySetMethod && !cacheContext.IsCachingDisabled())
 				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, cacheContext.LifeSpan, CacheName, cacheContext.DependencyTags);
 		}
 

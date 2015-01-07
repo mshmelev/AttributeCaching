@@ -78,6 +78,15 @@ namespace AttributeCaching.Tests
 
 
 		[TestMethod]
+		public void TestNullResult()
+		{
+			visitor.Expect (m => m.Visit()).Repeat.Once();
+			Assert.IsNull (testClass.CalcNull());
+			Assert.IsNull (testClass.CalcNull());
+		}
+
+
+		[TestMethod]
 		public void TestArrays()
 		{
 			visitor.Expect (m => m.Visit()).IgnoreArguments().Repeat.Times(4);

@@ -15,15 +15,15 @@ namespace AttributeCaching.CacheAdapters
 		protected abstract ObjectCache GetCache (string cacheName);
 
 
-		public override object Get(string key, string cacheName)
+		public override CacheItemWrapper Get(string key, string cacheName)
 		{
-			return GetCache (cacheName).Get(key);
+			return (CacheItemWrapper)GetCache(cacheName).Get(key);
 		}
 
 
 		public override void Set(string key, object value, TimeSpan lifeSpan, string cacheName, IEnumerable<string> dependencyTags)
 		{
-			GetCache(cacheName).Set(key, value, DateTimeOffset.UtcNow.Add (lifeSpan));
+			GetCache(cacheName).Set(key, new CacheItemWrapper {Value = value}, DateTimeOffset.UtcNow.Add (lifeSpan));
 			AddDependencyTags(key, dependencyTags);
 		}
 

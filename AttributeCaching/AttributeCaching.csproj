@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="CacheableAttribute.cs" />
     <Compile Include="CacheAdapters\CacheAdapter.cs" />
+    <Compile Include="CacheAdapters\CacheItemWrapper.cs" />
     <Compile Include="CacheAdapters\MemoryCacheAdapter.cs" />
     <Compile Include="CacheAdapters\ObjectCacheAdapter.cs" />
     <Compile Include="CacheContext.cs" />

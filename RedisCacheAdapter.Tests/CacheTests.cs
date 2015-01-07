@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Threading;
 using System.Xml;
+using AttributeCaching.CacheAdapters;
 using BookSleeve;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RedisCacheAdapter.Tests.Helpers;
@@ -83,7 +84,7 @@ namespace RedisCacheAdapter.Tests
 		public void GetSetTest()
 		{
 			cache.SetAsync("_~k1", "v1", TimeSpan.FromMinutes(1), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 		}
 
 
@@ -95,7 +96,7 @@ namespace RedisCacheAdapter.Tests
 			cache.SetAsync ("_~k1", d, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
 	
-			DateTimeOffset d2 = (DateTimeOffset)cache.Get ("_~k1", null);
+			DateTimeOffset d2 = (DateTimeOffset)cache.Get ("_~k1", null).Value;
 			Assert.AreEqual (d, d2);
 			Assert.AreEqual (d.Offset, d2.Offset);
 		}
@@ -110,7 +111,7 @@ namespace RedisCacheAdapter.Tests
 			cache.SetAsync ("_~k1", xml, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
 
-			var xml2 = (XmlDocument)cache.Get ("_~k1", null);
+			var xml2 = (XmlDocument)cache.Get ("_~k1", null).Value;
 			Assert.AreEqual (xml.OuterXml, xml2.OuterXml);
 		}
 
@@ -133,7 +134,7 @@ namespace RedisCacheAdapter.Tests
 			cache.SetAsync ("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
 
-			var c2= (ComplexClass)cache.Get ("_~k1", null);
+			var c2= (ComplexClass)cache.Get ("_~k1", null).Value;
 			
 			Assert.AreEqual (c.P1, c2.P1);
 			CollectionAssert.AreEqual(c.P2, c2.P2);
@@ -146,13 +147,21 @@ namespace RedisCacheAdapter.Tests
 			Assert.AreEqual(c.fb, c2.fb);
 		}
 
-		
 
+		[TestMethod]
+		public void TestNullValue()
+		{
+			cache.SetAsync("_~k1", null, TimeSpan.FromMinutes(1), null).Wait();
+			Assert.IsNotNull(cache.Get("_~k1", null));
+			Assert.IsNull(cache.Get("_~k1", null).Value);
+		}
+
+		
 		[TestMethod]
 		public void RemoveTest()
 		{
 			cache.SetAsync("_~k1", "v1", TimeSpan.FromMinutes(1), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 			Assert.IsTrue(cache.Remove("_~k1", null));
 			Assert.IsNull(cache.Get("_~k1", null));
 		}
@@ -162,7 +171,7 @@ namespace RedisCacheAdapter.Tests
 		public void ExpireTest()
 		{
 			cache.SetAsync("_~k1", "v1", TimeSpan.FromSeconds(1), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 			Thread.Sleep (1100);
 			Assert.IsNull(cache.Get("_~k1", null));
 		}
@@ -193,11 +202,25 @@ namespace RedisCacheAdapter.Tests
 		public void RemoteChangeKeyTest()
 		{
 			cache.SetAsync ("_~k1", "v1", TimeSpan.FromSeconds (10), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 
 			redisDb.Strings.Set(0, "_~k1", AttributeCaching.CacheAdapters.ProtoBuf.ProtoBufHelper.Serialize("v2"), 10).Wait();
 			Thread.Sleep (200);
-			Assert.AreEqual("v2", cache.Get("_~k1", null), "Redis is not configured?");
+			Assert.AreEqual("v2", cache.Get("_~k1", null).Value, "Notifications are not configured on Redis?");
+		}
+
+
+		[TestMethod]
+		public void RemoteChangeKeyNullTest()
+		{
+			cache.SetAsync ("_~k1", "v1", TimeSpan.FromSeconds (10), null).Wait();
+			Assert.AreEqual ("v1", cache.Get("_~k1", null).Value);
+
+			redisDb.Strings.Set(0, "_~k1", AttributeCaching.CacheAdapters.ProtoBuf.ProtoBufHelper.Serialize(NullValue.Value), 10).Wait();
+			Thread.Sleep (200);
+			var v = cache.Get("_~k1", null);
+			Assert.IsNotNull (v, "Notifications are not configured on Redis?");
+			Assert.IsNull (v.Value, "Notifications are not configured on Redis?");
 		}
 
 
@@ -205,11 +228,11 @@ namespace RedisCacheAdapter.Tests
 		public void RemoteDeleteKeyTest()
 		{
 			cache.SetAsync ("_~k1", "v1", TimeSpan.FromSeconds (10), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 
 			redisDb.Keys.Remove (0, "_~k1").Wait();
 			Thread.Sleep (200);
-			Assert.IsNull(cache.Get("_~k1", null), "Redis is not configured?");
+			Assert.IsNull(cache.Get("_~k1", null), "Notifications are not configured on Redis?");
 		}
 
 
@@ -237,11 +260,11 @@ namespace RedisCacheAdapter.Tests
 			cache.EvictAll (null, "_~d1", "_~d2", "_~d3");
 			Thread.Sleep(200);
 
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 			Assert.IsNull(cache.Get("_~k2", null));
-			Assert.AreEqual("v3", cache.Get("_~k3", null));
-			Assert.AreEqual("v4", cache.Get("_~k4", null));
-			Assert.AreEqual("v5", cache.Get("_~k5", null));
+			Assert.AreEqual("v3", cache.Get("_~k3", null).Value);
+			Assert.AreEqual("v4", cache.Get("_~k4", null).Value);
+			Assert.AreEqual("v5", cache.Get("_~k5", null).Value);
 		}
 
 
@@ -262,8 +285,8 @@ namespace RedisCacheAdapter.Tests
 			Assert.IsNull(cache.Get("_~k2", null));
 			Assert.IsNull(cache.Get("_~k3", null));
 			Assert.IsNull(cache.Get("_~k4", null));
-			Assert.AreEqual("v5", cache.Get("_~k5", null));
-			Assert.AreEqual("v6", cache.Get("_~k6", null));
+			Assert.AreEqual("v5", cache.Get("_~k5", null).Value);
+			Assert.AreEqual("v6", cache.Get("_~k6", null).Value);
 		}
 
 
@@ -276,13 +299,13 @@ namespace RedisCacheAdapter.Tests
 			cache.OnError += OnCacheError;
 
 			cache.SetAsync("_~k1", "v1", TimeSpan.FromSeconds(10), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 
 			cache.RedisConnection.Close (false);		// emulate failure
 			Thread.Sleep (100);
 
 			cache.SetAsync("_~k1", "v1", TimeSpan.FromSeconds(10), null).Wait();
-			Assert.AreEqual("v1", cache.Get("_~k1", null));
+			Assert.AreEqual("v1", cache.Get("_~k1", null).Value);
 		}
 
 
@@ -295,7 +318,7 @@ namespace RedisCacheAdapter.Tests
 			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
 
-			var c2 = (ClassWithList)cache.Get("_~k1", null);
+			var c2 = (ClassWithList)cache.Get("_~k1", null).Value;
 			CollectionAssert.AreEqual (new[] {1, 3, 5}, c2.Items);
 		}
 
@@ -309,7 +332,7 @@ namespace RedisCacheAdapter.Tests
 			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
 
-			var c2 = (ClassWithGetProp)cache.Get("_~k1", null);
+			var c2 = (ClassWithGetProp)cache.Get("_~k1", null).Value;
 			Assert.AreEqual ("aaa", c2.PublicProp);
 			Assert.AreEqual ("aaa_", c2.ReadonlyProp);
 			Assert.AreEqual ("aaa_", c2.PrivateSetProp);
@@ -329,7 +352,7 @@ namespace RedisCacheAdapter.Tests
 
 			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			var c2 = (DataContractClass)cache.Get("_~k1", null);
+			var c2 = (DataContractClass)cache.Get("_~k1", null).Value;
 
 			Assert.AreEqual ("ppp1", c2.P1);
 			Assert.AreEqual (42, c2.f1);
@@ -345,7 +368,7 @@ namespace RedisCacheAdapter.Tests
 
 			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			var c2 = (SerializableClass)cache.Get("_~k1", null);
+			var c2 = (SerializableClass)cache.Get("_~k1", null).Value;
 
 			Assert.AreEqual ("ppp1", c2.P1);
 			Assert.AreEqual (42, c2.f1);
@@ -361,7 +384,7 @@ namespace RedisCacheAdapter.Tests
 
 			cache.SetAsync("_~k1", c, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			var c2 = (ProtoContractClass)cache.Get("_~k1", null);
+			var c2 = (ProtoContractClass)cache.Get("_~k1", null).Value;
 
 			Assert.IsNull (c2.P1);
 			Assert.AreEqual (42, c2.f1);
@@ -375,19 +398,19 @@ namespace RedisCacheAdapter.Tests
 			int[] arr = {1, 2, 3, 4, 5};
 			cache.SetAsync("_~k1", arr, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			int[] arr2 = (int[])cache.Get("_~k1", null);
+			int[] arr2 = (int[])cache.Get("_~k1", null).Value;
 			CollectionAssert.AreEqual (arr, arr2);
 
 			var lst= new List<int> {1, 2, 3, 4, 5, 6};
 			cache.SetAsync("_~k1", lst, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			var lst2= (List<int>)cache.Get("_~k1", null);
+			var lst2 = (List<int>)cache.Get("_~k1", null).Value;
 			CollectionAssert.AreEqual (lst, lst2);
 
 			var set = new HashSet<string> { "1", "2", "3", "4", "5", "6", "7" };
 			cache.SetAsync("_~k1", set, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			var set2 = (HashSet<string>)cache.Get("_~k1", null);
+			var set2 = (HashSet<string>)cache.Get("_~k1", null).Value;
 			Assert.IsTrue (set.IsSubsetOf (set2) && set2.IsSubsetOf (set));
 		}
 
@@ -400,7 +423,7 @@ namespace RedisCacheAdapter.Tests
 			var dic = new Dictionary<string, DicClass> { { "a", new DicClass { Prop = "p1" } }, { "b", new DicClass { Prop = "p1" } } };
 			cache.SetAsync("_~k1", dic, TimeSpan.FromMinutes(1), null).Wait();
 			cache.MemoryCache.Remove("_~k1");
-			var dic2 = (Dictionary<string, DicClass>)cache.Get("_~k1", null);
+			var dic2 = (Dictionary<string, DicClass>)cache.Get("_~k1", null).Value;
 			CollectionAssert.AreEqual(dic.Keys, dic2.Keys);
 			CollectionAssert.AreEqual(dic.Values, dic2.Values);
 		}

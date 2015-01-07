@@ -10,7 +10,6 @@ using BookSleeve;
 
 namespace AttributeCaching.CacheAdapters
 {
-
 	/// <summary>
 	/// Uses Redis as a central storage with local in-memory cache.
 	/// Supports automatic failover between enlisted Redis servers (it's ok to be empty for the Redis server after switching over).
@@ -177,26 +176,29 @@ namespace AttributeCaching.CacheAdapters
 		}
 
 
-		public override object Get (string key, string cacheName)
+		public override CacheItemWrapper Get (string key, string cacheName)
 		{
 			if (!ValidateDb())
 				return null;
 
 			try
 			{
-				object obj = memoryCache.Get(key);
+				var cacheItem = (CacheItemWrapper)memoryCache.Get(key);
 
-				if (obj == null)
+				if (cacheItem == null)
 				{
 					var getTask = redis.Strings.Get(CacheDb, key);
 					var ttlTask = redis.Keys.TimeToLive(CacheDb, key);
 
-					obj = ProtoBufHelper.Deserialize(getTask.Result);
-					if (obj != null)
-						memoryCache.Set(key, obj, (ttlTask.Result == -1) ? DateTimeOffset.Now.AddYears(100) : DateTimeOffset.Now.AddSeconds(ttlTask.Result));
+					object value= ProtoBufHelper.Deserialize(getTask.Result);
+					if (value != null)
+					{
+						cacheItem = new CacheItemWrapper { Value = value.Equals(NullValue.Value) ? null : value };
+						memoryCache.Set(key, cacheItem, (ttlTask.Result == -1) ? DateTimeOffset.Now.AddYears(100) : DateTimeOffset.Now.AddSeconds(ttlTask.Result));
+					}
 				}
 
-				return obj;
+				return cacheItem;
 			}
 			catch (Exception ex)
 			{
@@ -219,14 +221,15 @@ namespace AttributeCaching.CacheAdapters
 
 			try
 			{
-				memoryCache.Set (key, value, DateTimeOffset.Now.Add (lifeSpan));
+				var cacheItem = new CacheItemWrapper {Value = value};
+				memoryCache.Set(key, cacheItem, DateTimeOffset.Now.Add(lifeSpan));
 
 				return Task.Run (() =>
 				{
 					try
 					{
-						recentKeys.Set (key, true, DateTimeOffset.Now.Add (RecentHistoryLifetime));
-						redis.Strings.Set (CacheDb, key, ProtoBufHelper.Serialize (value), (long) lifeSpan.TotalSeconds).Wait();
+						recentKeys.Set(key, true, DateTimeOffset.Now.Add(RecentHistoryLifetime));
+						redis.Strings.Set(CacheDb, key, ProtoBufHelper.Serialize (value ?? NullValue.Value), (long) lifeSpan.TotalSeconds).Wait();
 						AddDependencyTags (key, dependencyTags);
 						return true;
 					}
@@ -355,7 +358,7 @@ namespace AttributeCaching.CacheAdapters
 
 						var obj = ProtoBufHelper.Deserialize(getTask.Result);
 						if (obj != null)
-							memoryCache.Set(key, obj, (ttlTask.Result == -1) ? DateTimeOffset.Now.AddYears(100) : DateTimeOffset.Now.AddSeconds(ttlTask.Result));
+							memoryCache.Set(key, new CacheItemWrapper {Value = obj.Equals (NullValue.Value) ? null : obj}, (ttlTask.Result == -1) ? DateTimeOffset.Now.AddYears(100) : DateTimeOffset.Now.AddSeconds(ttlTask.Result));
 						else
 							memoryCache.Remove(key);
 					}

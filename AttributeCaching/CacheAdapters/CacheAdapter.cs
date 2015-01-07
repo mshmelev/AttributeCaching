@@ -14,7 +14,7 @@ namespace AttributeCaching.CacheAdapters
 		/// <param name="key"></param>
 		/// <param name="cacheName">pass null for default cache</param>
 		/// <returns>null, if object is not found</returns>
-		public abstract object Get (string key, string cacheName);
+		public abstract CacheItemWrapper Get(string key, string cacheName);
 
 
 		/// <summary>
