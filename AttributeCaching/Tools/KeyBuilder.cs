@@ -25,7 +25,7 @@ namespace AttributeCaching.Tools
 
 			foreach (int cacheArgIndex in cacheArgIndexes)
 			{
-				key.Append (GetParamValue(args[cacheArgIndex]));
+				AddParamValue (key, args[cacheArgIndex]);
 				key.Append (ParamSeparator);
 			}
 
@@ -33,10 +33,10 @@ namespace AttributeCaching.Tools
 		}
 
 
-		private static string GetParamValue (object val)
+		private static void AddParamValue (StringBuilder res, object val)
 		{
 			if (val == null)
-				return "";
+				return;
 
 			// strings
 			string strVal = val as string;
@@ -44,30 +44,29 @@ namespace AttributeCaching.Tools
 			{
 				if (strVal.Length == 0)
 					strVal = EmptyStringReplacer;
-				return strVal;
+				res.Append (strVal);
+				return;
 			}
 
 			// collections
 			IEnumerable coll = val as IEnumerable;
 			if (coll!= null)
 			{
-				var sb = new StringBuilder();
-				sb.Append ('[');
+				res.Append ('[');
 				foreach (object item in coll)
 				{
-					sb.Append (GetParamValue (item));
-					sb.Append (ParamSeparator);
+					AddParamValue (res, item);
+					res.Append (ParamSeparator);
 				}
-				sb.Append (']');
-				return sb.ToString();
+				res.Append (']');
+				return;
 			}
 
 			// all others
-			strVal = val.ToString();
-			if (strVal.Length == 0)
-				strVal = EmptyStringReplacer;
-
-			return strVal;
+			int n = res.Length;
+			res.Append (val);
+			if (res.Length== n)
+				res.Append (EmptyStringReplacer);
 		}
 	}
 }
