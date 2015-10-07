@@ -1,22 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttributeCaching", "AttributeCaching\AttributeCaching.csproj", "{341C6D6F-1A8E-42CA-8A1E-3DBDBE056E52}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttributeCaching.Tests", "AttributeCaching.Tests\AttributeCaching.Tests.csproj", "{482C1612-3928-49EE-90E2-B734CC802D43}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{768B5468-08B4-403D-AAF4-E5048F01F58D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCacheAdapter", "RedisCacheAdapter\RedisCacheAdapter.csproj", "{C2268C0C-E0C8-47FE-B411-CB10170492DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCacheAdapter.Tests", "RedisCacheAdapter.Tests\RedisCacheAdapter.Tests.csproj", "{1A572B66-827B-41F4-9371-ED05B9EECFCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B6D86794-2E9C-4ED4-B9F1-FD089839B783}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCacheAdapter", "RedisCacheAdapter\RedisCacheAdapter.csproj", "{C2268C0C-E0C8-47FE-B411-CB10170492DE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCacheAdapter.Tests", "RedisCacheAdapter.Tests\RedisCacheAdapter.Tests.csproj", "{1A572B66-827B-41F4-9371-ED05B9EECFCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
