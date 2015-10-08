@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Text;
-using PostSharp.Aspects;
 
 namespace AttributeCaching.Tools
 {
@@ -19,7 +18,7 @@ namespace AttributeCaching.Tools
 		/// <param name="methodDeclaration"></param>
 		/// <param name="cacheArgIndexes"></param>
 		/// <returns></returns>
-		public static string BuildKey (Arguments args, string methodDeclaration, int[] cacheArgIndexes)
+		public static string BuildKey (object[] args, string methodDeclaration, int[] cacheArgIndexes)
 		{
 			var key = new StringBuilder(methodDeclaration);
 

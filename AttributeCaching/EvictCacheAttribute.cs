@@ -1,5 +1,5 @@
 ﻿using System;
-using PostSharp.Aspects;
+using Shaspect;
 
 namespace AttributeCaching
 {
@@ -8,7 +8,7 @@ namespace AttributeCaching
 	/// Eviction is done after a method is executed (successfully or with exception).
 	/// </summary>
 	[Serializable]
-	public class EvictCacheAttribute : OnMethodBoundaryAspect
+	public class EvictCacheAttribute : BaseAspectAttribute
 	{
 		private readonly string[] dependencyTags;
 		
@@ -45,11 +45,11 @@ namespace AttributeCaching
 		}
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="args"></param>
-		public override void OnExit (MethodExecutionArgs args)
+	    /// <summary>
+	    /// 
+	    /// </summary>
+	    /// <param name="methodExecInfo"></param>
+	    public override void OnExit (MethodExecInfo methodExecInfo)
 		{
 			if (UseAllTags)
 				CacheFactory.Cache.EvictAll (CacheName, dependencyTags);

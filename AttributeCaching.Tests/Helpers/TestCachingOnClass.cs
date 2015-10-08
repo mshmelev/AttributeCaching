@@ -5,7 +5,7 @@
 	{
 		private readonly IVisitor visitor;
 
-		[Cacheable(AttributeExclude = true)]
+		[Cacheable(Exclude = true)]
 		public TestCachingOnClass(IVisitor visitor)
 		{
 			this.visitor = visitor;
@@ -21,14 +21,14 @@
 
 
 
-		[Cacheable(AttributeExclude = true)]
+		[Cacheable(Exclude = true)]
 		public string CalcNotCache()
 		{
 			visitor.Visit ();
 			return "notcached";
 		}
 
-		[Cacheable(AttributeExclude = true)]
+		[Cacheable(Exclude = true)]
 		public string CalcPropNotCache
 		{
 			get
@@ -42,7 +42,7 @@
 			}
 		}
 
-		[Cacheable(0.01, AttributeReplace = true)]
+		[Cacheable(0.01, Replace = true)]
 		public string CalcCacheOverride()
 		{
 			visitor.Visit();

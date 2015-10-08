@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using AttributeCaching.Tools;
-using PostSharp.Aspects;
+using Shaspect;
+
 
 namespace AttributeCaching
 {
@@ -11,7 +12,7 @@ namespace AttributeCaching
 	/// Allows caching of a property, method, or a whole class.
 	/// </summary>
 	[Serializable]
-	public class CacheableAttribute : OnMethodBoundaryAspect
+	public class CacheableAttribute : BaseAspectAttribute
 	{
 		private int[] cacheArgIndexes;
 		private string methodDeclaration;
@@ -151,12 +152,11 @@ namespace AttributeCaching
 		}
 
 
-		/// <summary>
-		/// Precalculate some parameters, method is invoked once during the compilation
+	    /// <summary>
+		/// Precalculate some parameters, method is invoked once during the assembly start
 		/// </summary>
 		/// <param name="method"></param>
-		/// <param name="aspectInfo"></param>
-		public override void CompileTimeInitialize(MethodBase method, AspectInfo aspectInfo)
+	    public override void Initialize (MethodBase method)
 		{
 			BuildCacheableArgIndexes(method);
 			methodDeclaration = Reflection.GetMethodDeclaration(method);
@@ -167,8 +167,6 @@ namespace AttributeCaching
 				propertyGetMethodDeclaration = Reflection.GetMethodDeclaration (method.ReflectedType.GetMethod("get_" + method.Name.Substring(4)));
 			}
 		}
-
-
 
 
 		/// <summary>
@@ -188,16 +186,15 @@ namespace AttributeCaching
 			cacheArgIndexes = indexes.ToArray();
 		}
 
-
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="args"></param>
-		public override void OnEntry(MethodExecutionArgs args)
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="methodExecInfo"></param>
+	    public override void OnEntry (MethodExecInfo methodExecInfo)
 		{
 			// try to get from cache first
-			string key = KeyBuilder.BuildKey(args.Arguments, methodDeclaration, cacheArgIndexes);
+			string key = KeyBuilder.BuildKey (methodExecInfo.Arguments, methodDeclaration, cacheArgIndexes);
 			var cacheItem = CacheFactory.Cache.Get (key, CacheName);
 
 			if (cacheItem == null && syncMethodCall)
@@ -212,35 +209,34 @@ namespace AttributeCaching
 
 			if (cacheItem != null)
 			{
-				args.ReturnValue = cacheItem.Value;
-				args.FlowBehavior = FlowBehavior.Return;
+				methodExecInfo.ReturnValue = cacheItem.Value;
+				methodExecInfo.ExecFlow = ExecFlow.Return;
 				return;
 			}
 
 			// get value from the method itself
 			var context= CacheScope.AddContext (key, lifeSpan, DependencyTags);
-			args.MethodExecutionTag = context;
+			methodExecInfo.Data = context;
 		}
 
 
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="args"></param>
-		public override void OnSuccess(MethodExecutionArgs args)
+	    /// <summary>
+	    /// 
+	    /// </summary>
+	    /// <param name="methodExecInfo"></param>
+	    public override void OnSuccess (MethodExecInfo methodExecInfo)
 		{
-			var cacheContext = (CacheContext) args.MethodExecutionTag;
+			var cacheContext = (CacheContext) methodExecInfo.Data;
 			if (!isPropertySetMethod && !cacheContext.IsCachingDisabled())
-				CacheFactory.Cache.Set(cacheContext.CacheKey, args.ReturnValue, cacheContext.LifeSpan, CacheName, cacheContext.DependencyTags);
+				CacheFactory.Cache.Set(cacheContext.CacheKey, methodExecInfo.ReturnValue, cacheContext.LifeSpan, CacheName, cacheContext.DependencyTags);
 		}
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="args"></param>
-		public override void OnExit(MethodExecutionArgs args)
+	    /// <summary>
+	    /// 
+	    /// </summary>
+	    /// <param name="methodExecInfo"></param>
+	    public override void OnExit (MethodExecInfo methodExecInfo)
 		{
 			// clear cache for the property's Get method if Set was called
 			if (isPropertySetMethod)
@@ -249,9 +245,9 @@ namespace AttributeCaching
 				CacheFactory.Cache.Remove(key, CacheName);
 			}
 
-			if (args.MethodExecutionTag != null)
+			if (methodExecInfo.Data != null)
 			{
-				var context = (CacheContext) args.MethodExecutionTag;
+				var context = (CacheContext) methodExecInfo.Data;
 
 				string lockKey = String.Intern (context.CacheKey);
 				if (syncMethodCall && Monitor.IsEntered (lockKey))
