@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata minClientVersion="2.5">
+    <id>AttributeCaching.Redis</id>
+    <version>2.0.0</version>
+    <title>AttributeCaching.Redis</title>
+    <description>Provides caching using Redis on methods using C# attributes (AOP approach)</description>
+    <authors>Max Shmelev</authors>
+    <owners>Max Shmelev</owners>
+    <projectUrl>https://github.com/mshmelev/AttributeCaching</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>Max Shmelev, 2014-2015</copyright>
+    <tags>Cache Caching Attribute Redis AOP</tags>
+	<dependencies>
+      <dependency id="AttributeCaching" version="2.0" />
+      <dependency id="BookSleeve" version="1.3.41" />
+      <dependency id="protobuf-net" version="2.0.0.668" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\RedisCacheAdapter\bin\Release\RedisCacheAdapter.dll" target="lib\net45\" />
+  </files>
+</package>
