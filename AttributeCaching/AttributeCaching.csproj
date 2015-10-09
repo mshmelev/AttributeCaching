@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>6147981a</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>96f1daa1</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,8 +38,8 @@
     <DocumentationFile>bin\Release\AttributeCaching.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Shaspect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1a025256a2d0d936, processorArchitecture=MSIL">
-      <HintPath>..\packages\Shaspect.1.0.0\lib\net45\Shaspect.dll</HintPath>
+    <Reference Include="Shaspect, Version=1.1.0.0, Culture=neutral, PublicKeyToken=1a025256a2d0d936, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shaspect.1.1.0\lib\net45\Shaspect.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -62,16 +62,18 @@
     <Compile Include="Tools\Reflection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Import Project="..\packages\Shaspect.1.0.0\build\net45\Shaspect.targets" Condition="Exists('..\packages\Shaspect.1.0.0\build\net45\Shaspect.targets')" />
+  <Import Project="..\packages\Shaspect.1.1.0\build\net45\Shaspect.targets" Condition="Exists('..\packages\Shaspect.1.1.0\build\net45\Shaspect.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Shaspect.1.0.0\build\net45\Shaspect.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Shaspect.1.0.0\build\net45\Shaspect.targets'))" />
+    <Error Condition="!Exists('..\packages\Shaspect.1.1.0\build\net45\Shaspect.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Shaspect.1.1.0\build\net45\Shaspect.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
