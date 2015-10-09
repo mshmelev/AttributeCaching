@@ -5,6 +5,9 @@
 	/// </summary>
 	public sealed class CacheItemWrapper
 	{
+        /// <summary>
+        /// Cached value
+        /// </summary>
 		public object Value { get; set; }
 	}
 }

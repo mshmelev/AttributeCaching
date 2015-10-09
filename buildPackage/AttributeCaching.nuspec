@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata minClientVersion="2.5">
+    <id>AttributeCaching</id>
+    <version>2.0.0</version>
+    <title>AttributeCaching</title>
+    <description>Provides caching on methods using C# attributes (AOP approach)</description>
+    <authors>Max Shmelev</authors>
+    <owners>Max Shmelev</owners>
+    <projectUrl>https://github.com/mshmelev/AttributeCaching</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>Max Shmelev, 2013-2015</copyright>
+    <tags>Cache Caching Attribute AOP</tags>
+	<dependencies>
+      <dependency id="Shaspect" version="1.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\AttributeCaching\bin\Release\AttributeCaching.dll" target="lib\net45\" />
+    <file src="..\AttributeCaching\bin\Release\AttributeCaching.xml" target="lib\net45\" />
+  </files>
+</package>
