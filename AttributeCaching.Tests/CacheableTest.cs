@@ -244,9 +244,9 @@ namespace AttributeCaching.Tests
 			var t3 = Task.Run(() => d3= testClass.CalcLongProcess("a3"));
 			Task.WaitAll(t1, t2, t3);
 
-			Assert.IsTrue (Math.Abs ((d2-d1).TotalMilliseconds)< 500, "Lock occured");
-			Assert.IsTrue (Math.Abs ((d3-d1).TotalMilliseconds)< 500, "Lock occured");
-			Assert.IsTrue (Math.Abs ((d3-d2).TotalMilliseconds)< 500, "Lock occured");
+			Assert.IsTrue (Math.Abs ((d2-d1).TotalMilliseconds)< 500, "Lock occurred");
+			Assert.IsTrue (Math.Abs ((d3-d1).TotalMilliseconds)< 500, "Lock occurred");
+			Assert.IsTrue (Math.Abs ((d3-d2).TotalMilliseconds)< 500, "Lock occurred");
 		}
 
 
