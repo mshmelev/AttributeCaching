@@ -23,7 +23,7 @@ namespace AttributeCaching
 
 
 		/// <summary>
-		/// Default constructor, specifies infinit cache lifetime
+		/// Default constructor, specifies infinite cache lifetime
 		/// </summary>
 		/// <param name="dependencyTags"></param>
 		public CacheableAttribute(params string[] dependencyTags)

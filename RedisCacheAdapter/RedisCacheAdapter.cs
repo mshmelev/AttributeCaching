@@ -36,7 +36,7 @@ namespace AttributeCaching.CacheAdapters
 		private readonly static object sync= new object();
 
 		/// <summary>
-		/// Raised on any error occured: in background and in foreground
+		/// Raised on any error occurred: in background and in foreground
 		/// </summary>
 		public event EventHandler<Exception> OnError;
 
